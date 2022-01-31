@@ -1,11 +1,13 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from models.item import Item
+from flask_sqlalchemy import SQLAlchemy
 
 
 class User(db.Model):
     id=db.Column(db.integer,primary_key=True)
     username=db.Column(db.String,unique=True,nullable=False)
     password=db.Column(db.String,nullable=False)
+    items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
