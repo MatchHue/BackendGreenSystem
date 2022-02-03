@@ -17,7 +17,11 @@ def create_item():
     return redirect(url_for('index'))
 
 
-@app.route('/',methods=['GET'])
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/items',methods=['GET'])
 def list_items():
     items=Item.query.all()
     return render_template('product.html',items=items)
