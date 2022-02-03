@@ -43,15 +43,21 @@ class Item(db.Model):
     image=db.COlumn(db.String,nullable=False)
     quantity=db.Column(db.integer,nullable=False)
     price=db.Column(db.integer,nullable=False)
+    cart_items=db.relationship('Item',backref='item')
 
 
     def toDict(self):
         return{
             'id': self.id,
             'name': self.name,
+            'image':self.image,
             'quantity': self.quantity,
             'price':self.price
         }
+
+class Cart(db.Model):
+    id=db.Column(db.integer,primary_key=True)
+    item_id=db.Column(db.integer,db.ForeignKey('item.id'))
 
 
 
