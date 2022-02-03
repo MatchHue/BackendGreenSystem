@@ -4,6 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 
+@app.route('/test',methods=['GET'])
+def test():
+    return "<h1>HELLO<h1>"
+
 @app.route('/create_item',methods=['POST'])
 def create_item():
     data=request.form
