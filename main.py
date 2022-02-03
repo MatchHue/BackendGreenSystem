@@ -1,8 +1,10 @@
-from flask import Flask
+from flask import Flask, render_template,request,redirect,url_for,redirect
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app=Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
+db=SQLAlchemy(app)
 
 
 
@@ -10,7 +12,7 @@ app=Flask(__name__)
 #Models
 
 class User(db.Model):
-    id=db.Column(db.integer,primary_key=True)
+    id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String,unique=True,nullable=False)
     password=db.Column(db.String,nullable=False)
     items=db.relationship('Item',backref='user')
@@ -37,12 +39,12 @@ class User(db.Model):
 
 
 class Item(db.Model):
-    id=db.Column(db.integer,primary_key=True)
-    user_id=db.Column(db.integer,db.ForeignKey('user.id'))
+    id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     name=db.Column(db.String,nullable=False)
-    image=db.COlumn(db.String,nullable=False)
-    quantity=db.Column(db.integer,nullable=False)
-    price=db.Column(db.integer,nullable=False)
+    image=db.Column(db.String,nullable=False)
+    quantity=db.Column(db.Integer,nullable=False)
+    price=db.Column(db.Integer,nullable=False)
     cart_items=db.relationship('Item',backref='item')
 
 
@@ -56,9 +58,14 @@ class Item(db.Model):
         }
 
 class Cart(db.Model):
-    id=db.Column(db.integer,primary_key=True)
-    item_id=db.Column(db.integer,db.ForeignKey('item.id'))
+    id=db.Column(db.Integer,primary_key=True)
+    item_id=db.Column(db.Integer,db.ForeignKey('item.id'))
 
+
+
+@app.route('/',methods=['GET'])
+def index():
+    return render_template('index.html')
 
 
 if __name__=="__main__":
