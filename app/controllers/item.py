@@ -1,4 +1,4 @@
-from models.item import Item
+from app.models import Item
 from flask import Flask, render_template,request,redirect,url_for,redirect
 from flask_sqlalchemy import SQLAlchemy
 
