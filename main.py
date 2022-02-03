@@ -67,6 +67,10 @@ class Cart(db.Model):
 def index():
     return render_template('index.html')
 
+@app.route('/test',methods=['GET'])
+def testroute():
+    return "<p1>TEST<p1>"
+
 
 if __name__=="__main__":
     app.run(debug=True)
