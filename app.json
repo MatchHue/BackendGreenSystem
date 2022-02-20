@@ -1,0 +1,6 @@
+{
+    "name": "Flask MVC",
+    "description": "A MVC Template for Flask Apps",
+    "repository": "https://github.com/MatchHue",
+    "keywords": ["flask", "mvc", "foood"]
+  }
