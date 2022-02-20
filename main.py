@@ -198,7 +198,49 @@ def bulk_purchase():
 
 
 
-@app.route
+@app.route('/search',methods=['GET'])
+def search():
+    results={
+            "items": [
+        {
+        "name":"mango",
+        "price":"$3 per",
+        "image":"pumpkin.png",
+        "quantity":20
+        }
+                ]
+
+        }
+    return results
+
+@app.route('/sort_by_price',methods=['GET'])
+def sort_by_price():
+    sorted={
+            "items":[
+            {
+            "item_id":3,
+            "name":"Pommecythere",
+            "price":"$2 per",
+            "image":"pommecythere.png",
+            "quantity":100
+            },
+            {
+            "item_id":2,
+            "name":"mango",
+            "price":"$3 per",
+            "image":"pumpkin.png",
+            "quantity":20
+            },
+            {
+            "item_id":1,
+            "name":"pumpkin",
+            "price":"6$ per pound",
+            "image":"pumpkin.png",
+            "quantity":"40lbs"
+            }
+                 ]
+    }
+    return sorted
 
 
 if __name__=="__main__":
