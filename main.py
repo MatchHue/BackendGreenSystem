@@ -146,8 +146,59 @@ def get_rating():
     }
     return user_rating
 
-@
+@app.route('/get_all_items',methods=['GET'])
+def get_all_items():
+    all_items={"items":[
+    {
+    "user_id":2,
+    "name":"pumpkin",
+    "price":"6$ per pound",
+    "image":"pumpkin.png",
+    "quantity":"40lbs"
+    },
+    {
+    "user_id":2,
+    "name":"mango",
+    "price":"$3 per",
+    "image":"mango.png",
+    "quantity":20
+    },
+    {
+    "user_id":2,
+    "item_id":3,
+    "name":"Pommecythere",
+    "price":"$2 per",
+    "image":"pommecythere.png",
+    "quantity":100
+    }
+    ]}
+    return all_items
 
+
+@app.route('/bulk_purchase',methods=['GET'])
+def bulk_purchase():
+    items={
+    "user": [
+    {
+    "user_id": 2,
+    "email": "matthew234@mail.com",
+    "username": "Matthew",
+    "items":[
+    {
+    "name":"Pommecythere",
+    "price":"$2 per",
+    "image":"pommecythere.png",
+    "quantity":50
+    }
+        ]
+    }
+         ]
+    }
+    return items
+
+
+
+@app.route
 
 
 if __name__=="__main__":
