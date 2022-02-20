@@ -243,5 +243,50 @@ def sort_by_price():
     return sorted
 
 
+@app.route('/sort_by_name',methods=['GET'])
+def sort_by_name():
+    results={
+    "items": [
+        {
+            "item_id": 1,
+            "name": "mango",
+            "price": "$3 per",
+            "image": "pumpkin.png",
+            "quantity": 20
+        },
+        {
+            "item_id": 3,
+            "name": "Pommecythere",
+            "price": "$2 per",
+            "image": "pommecythere.png",
+            "quantity": 100
+        },
+        {
+            "item_id": 1,
+            "name": "pumpkin",
+            "price": "6$ per pound",
+            "image": "pumpkin.png",
+            "quantity": "40lbs"
+        }
+            ]
+    }
+    return results
+
+
+@app.route('/get_item_detail',methods=['GET'])
+def get_item_detail():
+    item_details={
+    "item_id": 1,
+    "name": "mango",
+    "price": "$3 per",
+    "image": "pumpkin.png",
+    "quantity": 20,
+    "user": {
+        "username": "Matthew"
+        }
+    }
+    return item_details
+
+
 if __name__=="__main__":
     app.run(debug=True)
