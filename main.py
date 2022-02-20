@@ -81,7 +81,25 @@ def signup():
 def login():
     return jsonify(message="Login Successful"),200
 
+@app.route('/get_all_users',methods=['GET'])
+def get_all_users():
 
+    users=[{
+        "id":1,
+        "email": "marc123@mail.com",
+        "username":"Marc"
+    },
+    {
+        "id":2,
+        "email": "matthew234@mail.com",
+        "username":"Matthew"   
+    },
+    {
+        "id":3,
+        "email":"michael567@mail.com",
+        "username":"Michael"
+    }]
+    return jsonify(users)
 
 
 
