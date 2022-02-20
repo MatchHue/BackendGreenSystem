@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify
+from flask import Flask, render_template,request,redirect,url_for,redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
