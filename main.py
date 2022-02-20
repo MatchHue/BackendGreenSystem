@@ -287,6 +287,87 @@ def get_item_detail():
     }
     return item_details
 
+@app.route('/add_to_cart',methods=['POST'])
+def add_to_cart():
+    cart={
+    "item_id": 1,
+    "name": "mango",
+    "price": "$3 per",
+    "image": "mango.png",
+    "quantity": 5
+    }
+
+    return jsonify(message='Item added'),cart
+
+@app.route('/checkout',methods=['POST'])
+def checkout():
+    cart={
+        item:{
+        "name":"mango",
+        "price":"$3 per",
+        "image":"mango.png",
+        "quantity":15
+        }
+        }
+    return cart,200
+
+@app.route('/paynow',methods=['POST'])
+def paynow():
+    checkout={
+    "user": [
+        {
+            "location": {
+                "longitude ": 10.643411,
+                "latitude": -61.400344
+            }
+        }
+     ],
+    "payment_method": "Cash",
+    "delivery_option": "Pickup"
+    }
+
+    return checkout,201
+
+@app.route('/order_list',methods=['GET'])
+def order_list():
+    order_list={
+    "user": [
+        {
+            "user_id": 4,
+            "username": "Bob",
+            "email": "bobross@Mail.com",
+            "password": "bobcanpaint123",
+            "phone_number": 1234567,
+            "location": {
+                "longitude ": 10.643411,
+                "latitude": -61.400344
+            }
+        }
+        ],
+        "orders": [
+            {
+                "item_id": 1,
+                "name": "mango",
+                "price": "$3 per",
+                "image": "mango.png",
+                "quantity": 5
+            }
+        ],
+    }
+    return order_list
+
+@app.route('/confirm_order',methods=['POST'])
+def confirm_order():
+    return jsonify(message='Order Confirmed')
+
+@app.route('/map',methods=['GET'])
+def map():
+    locations= {
+            "location": {
+                "longitude ": 10.643411,
+                "latitude": -61.400344
+            }}
+    return locations
 
 if __name__=="__main__":
     app.run(debug=True)
