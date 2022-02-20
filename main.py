@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,redirect
+from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -81,27 +81,7 @@ def signup():
 def login():
     return jsonify(message="Login Successful"),200
 
-@app.route('/get_all_users',methods=['GET'])
-def get_all_users():
 
-    users=[{
-        "id":1,
-        "email": "marc123@mail.com",
-        "username":"Marc"
-    },
-    {
-        "id":2,
-        "email": "matthew234@mail.com",
-        "username":"Matthew"   
-    },
-    {
-        "id":3,
-        "email":"michael567@mail.com",
-        "username":"Michael"
-    }]
-
-
-    return users
 
 
 
