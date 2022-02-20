@@ -126,9 +126,27 @@ def get_user_items():
 }
     return user_item
 
-@app.route('/list_items',methods=['GET'])
+@app.route('/list_items',methods=['POST'])
 def list_items():
-    return 200
+    
+    return jsonify(message='Item created'),200
+
+@app.route('/rate_user',methods=['POST'])
+def rate_user():
+    rated={
+        "user_id":2,
+        "rating":3
+    }
+    return jsonify(message='User rated'),rated
+
+@app.route('/get_rating',methods=['GET'])
+def get_rating():
+    user_rating={
+    "rating":3
+    }
+    return user_rating
+
+@
 
 
 
