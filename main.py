@@ -84,7 +84,7 @@ def login():
 @app.route('/get_all_users',methods=['GET'])
 def get_all_users():
 
-    users=[{
+    users={[{
         "id":1,
         "email": "marc123@mail.com",
         "username":"Marc"
@@ -98,11 +98,37 @@ def get_all_users():
         "id":3,
         "email":"michael567@mail.com",
         "username":"Michael"
-    }]
-
-
+    }]}
     return users
 
+@app.route('/get_user_items',methods=['GET'])
+def get_user_items():
+    user_item= {
+    "user_id": 2,
+    "email": "matthew234@mail.com",
+    "username": "Matthew",
+    "items": [
+        {
+            "item_id": 1,
+            "name": "pumpkin",
+            "price": "6$ per pound",
+            "image": "pumpkin.png",
+            "quantity": "40lbs"
+        },
+        {
+            "item_id": 2,
+            "name": "mango",
+            "price": "$3 per",
+            "image": "mango.png",
+            "quantity": 20
+        }
+    ]
+}
+    return user_item
+
+@app.route('/list_items',methods=['GET'])
+def list_items():
+    
 
 
 
