@@ -84,7 +84,7 @@ def login():
 @app.route('/get_all_users',methods=['GET'])
 def get_all_users():
 
-    users={[{
+    users=[{
         "id":1,
         "email": "marc123@mail.com",
         "username":"Marc"
@@ -98,8 +98,8 @@ def get_all_users():
         "id":3,
         "email":"michael567@mail.com",
         "username":"Michael"
-    }]}
-    return users
+    }]
+    return jsonify(users)
 
 @app.route('/get_user_items',methods=['GET'])
 def get_user_items():
@@ -128,7 +128,7 @@ def get_user_items():
 
 @app.route('/list_items',methods=['GET'])
 def list_items():
-    
+    return 200
 
 
 
