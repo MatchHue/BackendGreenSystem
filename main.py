@@ -2,6 +2,7 @@ from flask import Flask, render_template,request,redirect,url_for,redirect,jsoni
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
