@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify
+from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField
@@ -101,7 +101,7 @@ def login():
     return jsonify(message="Login Successful"),200
 
 
-@app.route('/logout',methods=['POST'])
+@app.route('/logout',methods=['GET','POST'])
 #@login_required
 def logout():
     logout_user()
