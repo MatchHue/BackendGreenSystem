@@ -1,7 +1,7 @@
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError
+from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user
@@ -11,7 +11,10 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 db=SQLAlchemy(app)
 
 
-def
+def LoginForm(FlaskForm):
+    email=EmailField("Email",validators=[DataRequired()])
+    passowrd=PasswordField("Password",validators=[DataRequired()])
+    submit=SubmitField("Submit")
 
 #Models
 
