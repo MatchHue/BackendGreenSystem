@@ -4,11 +4,24 @@ from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user
+from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
+app.config['SECRET_KEY']='CharizardIsTheBestStarter'
 db=SQLAlchemy(app)
+
+#Login Setup
+login_manager=LoginManager()
+login_manager.init_app(app)
+login_manager.login_view='login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+
+
 
 
 class LoginForm(FlaskForm):
@@ -87,6 +100,14 @@ def signup():
 def login():
     return jsonify(message="Login Successful"),200
 
+
+@app.route('/logout',methods=['POST'])
+#@login_required
+def logout():
+    logout_user()
+    flash("Succesfully Logged Out")
+    return redirect(url_for('login')) 
+
 @app.route('/get_all_users',methods=['GET'])
 def get_all_users():
 
@@ -133,11 +154,13 @@ def get_user_items():
     return user_item
 
 @app.route('/list_items',methods=['POST'])
+#@login_required
 def list_items():
     
     return jsonify(message='Item created'),200
 
 @app.route('/rate_user',methods=['POST'])
+#@login_required
 def rate_user():
     rated={
         "user_id":2,
@@ -182,6 +205,7 @@ def get_all_items():
 
 
 @app.route('/bulk_purchase',methods=['GET'])
+#@login_required
 def bulk_purchase():
     items={
     "user": [
@@ -294,6 +318,7 @@ def get_item_detail():
     return item_details
 
 @app.route('/add_to_cart',methods=['POST'])
+#@login_required
 def add_to_cart():
     cart={
     "item_id": 1,
@@ -306,6 +331,7 @@ def add_to_cart():
     return jsonify(message='Item added'),cart
 
 @app.route('/checkout',methods=['POST'])
+#@login_required
 def checkout():
     cart={
         item:{
@@ -318,6 +344,7 @@ def checkout():
     return cart,200
 
 @app.route('/paynow',methods=['POST'])
+#@login_required
 def paynow():
     checkout={
     "user": [
@@ -335,6 +362,7 @@ def paynow():
     return checkout,201
 
 @app.route('/order_list',methods=['GET'])
+#@login_required
 def order_list():
     order_list={
     "user": [
@@ -363,6 +391,7 @@ def order_list():
     return order_list
 
 @app.route('/confirm_order',methods=['POST'])
+#@login_required
 def confirm_order():
     return jsonify(message='Order Confirmed')
 
