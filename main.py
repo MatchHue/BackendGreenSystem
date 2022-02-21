@@ -128,6 +128,7 @@ def get_all_users():
     }]
     return jsonify(users)
 
+
 @app.route('/get_user_items',methods=['GET'])
 def get_user_items():
     user_item= {
@@ -271,6 +272,7 @@ def sort_by_price():
                  ]
     }
     return sorted
+
 
 
 @app.route('/sort_by_name',methods=['GET'])
