@@ -11,7 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 db=SQLAlchemy(app)
 
 
-def LoginForm(FlaskForm):
+class LoginForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
     passowrd=PasswordField("Password",validators=[DataRequired()])
     submit=SubmitField("Submit")
