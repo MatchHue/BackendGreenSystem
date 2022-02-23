@@ -1,7 +1,7 @@
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField
+from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
@@ -27,6 +27,15 @@ def load_user(user_id):
 class LoginForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
     passowrd=PasswordField("Password",validators=[DataRequired()])
+    submit=SubmitField("Submit")
+
+class SignUpForm(FlaskForm):
+    username=StringField("Username",validators=[DataRequired()])
+    email=EmailField("Email",validators=[DataRequired()])
+    phone_number=StringField("Contact Number",validators=[DataRequired()])
+    passowrd=PasswordField("Password",validators=[DataRequired()])
+    longtitude=DecimalField("longtitude",validators=[DataRequired()])
+    latitude=DecimalField("latitude",validators=[DataRequired()])
     submit=SubmitField("Submit")
 
 #Models
