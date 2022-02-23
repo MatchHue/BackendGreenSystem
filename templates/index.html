@@ -8,7 +8,17 @@
     <h1>GREEN SYSTEM BACKEND</h1>
     <p>Test to make sure GreenSystem is Hosted and Working</p>
     <div class="container">
-        
+        {% for user in users %}
+        <div>
+            {{user.username}}
+            {{user.email}}
+            {{user.password}}
+            {{user.phone_number}}
+            {{user.longtitude}}
+            {{user.latitude}}
+        </div>
+
+        {% endfor%}
 
     </div>
 {% endblock %}

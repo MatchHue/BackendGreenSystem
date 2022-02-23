@@ -98,7 +98,8 @@ class Cart(db.Model):
 
 @app.route('/',methods=['GET'])
 def index():
-    return render_template('index.html')
+    users=User.query.all()
+    return render_template('index.html',users=users)
 
 @app.route('/test',methods=['GET'])
 def testroute():
@@ -109,12 +110,17 @@ def testroute():
 def signup():
     form=SignUpForm()
     if form.validate_on_submit():
-        newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
-        phone_number=form.phone_number.data,
-        longtitude=form.longtitude.data,latitude=form.latitude.data)
-        db.session.add(newUser)
-        db.session.commit()
+        user=User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
+            phone_number=form.phone_number.data,
+            longtitude=form.longtitude.data,latitude=form.latitude.data)
+            db.session.add(newUser)
+            db.session.commit()
         form.username.data=''
+        form.email.data=''
+        users=User.query.all()
+        return redirect(url_for('index'))
     return render_template('signup.html',form=form)
 
 @app.route('/login',methods=['POST'])
