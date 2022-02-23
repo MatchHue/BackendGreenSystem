@@ -119,7 +119,6 @@ def signup():
             db.session.commit()
         form.username.data=''
         form.email.data=''
-        users=User.query.all()
         return redirect(url_for('index'))
     return render_template('signup.html',form=form)
 
