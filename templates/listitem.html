@@ -14,28 +14,28 @@
 
         <label>Item Image</label>
         <div class="input-group mb-3">
-            <input type="file" class="form-control" id="inputGroupFile02" >
+            <input type="file" class="form-control" name="pic" id="inputGroupFile02" >
             <label class="input-group-text" for="inputGroupFile02">Upload</label>
         </div>
         
         <div class="col">
-            <input type="text" class="form-control" placeholder="Item Name" aria-label="Item Name">
+            <input type="text" class="form-control" placeholder="Item Name" name="Item Name"aria-label="Item Name">
           </div>
 
           <br/>
 
         <div class="row g-3">
             <div class="col">
-              <input type="number" class="form-control" placeholder="Quantity in kg" aria-label="Quantity">
+              <input type="number" class="form-control" placeholder="Quantity in kg" name="Quantity" aria-label="Quantity">
             </div>
             <div class="col">
-              <input type="number" class="form-control" placeholder="Price per kg" aria-label="Price">
+              <input type="number" class="form-control" placeholder="Price per kg" name="Price" aria-label="Price">
             </div>
           </div>
 
           <br/>
           <label class="visually-hidden" for="specificSizeSelect">Delivery Option</label>
-            <select class="form-select" id="specificSizeSelect">
+            <select class="form-select" name="Delivery" id="specificSizeSelect">
             <option selected>Delivery Option...</option>
             <option value="1">Choose to Deliver</option>
             <option value="2">Have customer Pickup </option>

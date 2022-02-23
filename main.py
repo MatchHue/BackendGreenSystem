@@ -85,6 +85,7 @@ class Item(db.Model):
     mimetype=db.Column(db.String,nullable=False)
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Integer,nullable=False)
+    delivery=db.Column(db.String,nullable=False)
     #cart_items=db.relationship('Item',backref='item')
 
 
@@ -106,7 +107,8 @@ class Cart(db.Model):
 @app.route('/',methods=['GET'])
 def index():
     users=User.query.all()
-    return render_template('index.html',users=users)
+    items=Item.query.all()
+    return render_template('index.html',users=users,items=items)
 
 @app.route('/test',methods=['GET'])
 def testroute():
@@ -194,10 +196,17 @@ def get_user_items():
 @app.route('/list_items',methods=['GET','POST'])
 #@login_required
 def list_items():
-    form=ItemForm()
-    if form.validate_on_submit():
-        return('200')
-
+    if request.method=='POST':
+        data=request.form
+        picture=request.files['pic']
+        mimetype=picture.mimetype
+        newItem=Item(name=data['Item Name'],image=picture.read(),image_name=picture.filename,mimetype=mimetype,
+        quantity=data['Quantity'],price=data['Price'],delivery=data['Delivery'])
+        img=Item(image=picture.read(),mimetype=mimetype,image_name=picture.filename)
+        db.seession.add(newItem)
+        db.session.commit()
+        return redirect(url_for('index'))
+        
     return render_template('listitem.html')
 
 @app.route('/rate_user',methods=['POST'])
