@@ -27,12 +27,15 @@
         {{form.password(class="form-control")}}
 
         <br/>
-        {{form.longtitude.label}}
-        {{form.longtitude(class="form-control")}}
-
-        <br/>
-        {{form.latitude.label}}
-        {{form.latitude(class="form-control")}}
+        <p>Location</p>
+        <div class="row g-3">
+            <div class="col">
+                {{form.longtitude(class="form-control",  placeholder="longtitude")}}
+            </div>
+            <div class="col">
+                {{form.latitude(class="form-control",placeholder="latitude")}}
+            </div>
+          </div>
 
         <br/>
         {{form.submit}}
