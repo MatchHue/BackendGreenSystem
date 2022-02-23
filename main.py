@@ -32,8 +32,8 @@ class LoginForm(FlaskForm):
 class SignUpForm(FlaskForm):
     username=StringField("Username",validators=[DataRequired()])
     email=EmailField("Email",validators=[DataRequired()])
-    phone_number=StringField("Contact Number",validators=[DataRequired()])
-    passowrd=PasswordField("Password",validators=[DataRequired()])
+    phone_number=StringField("Contact",validators=[DataRequired()])
+    password=PasswordField("Password",validators=[DataRequired()])
     longtitude=DecimalField("longtitude",validators=[DataRequired()])
     latitude=DecimalField("latitude",validators=[DataRequired()])
     submit=SubmitField("Submit")
@@ -101,13 +101,21 @@ def testroute():
     return "<p1>TEST<p1>"
 
 
-@app.route('/signup',methods=['POST'])
+@app.route('/signup',methods=['GET','POST'])
 def signup():
-    return jsonify(message="User Created"),200
+    form=SignUpForm()
+    if form.validate_on_submit():
+        username=form.username.data
+        form.username.data=''
+    return render_template('signup.html',form=form)
 
 @app.route('/login',methods=['POST'])
 def login():
-    return jsonify(message="Login Successful"),200
+    form=SignUpForm()
+    if form.validate_on_submit():
+        username=form.username.data
+        form.username.data=''
+    return render_template('signup.html',form=form)
 
 
 @app.route('/logout',methods=['GET','POST'])

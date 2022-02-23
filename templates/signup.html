@@ -1,11 +1,43 @@
-{% extends index.html%}
+{% extends "layout.html"%}
 
 
 {{super()}}
 
 
 {% block content %}
+    <div class="container">
+    <form method="POST">
+        {{form.hidden_tag()}}
 
+        {{form.email.label}}
+        {{form.email(class="form-control")}}
+        <br/>
+        {{form.username.label}}
+        {{form.username(class="form-control")}}
+
+        <br/>
+        {{form.password.label}}
+        {{form.password(class="form-control")}}
+        <br/>
+        {{form.phone_number.label}}
+        {{form.phone_number(class="form-control")}}
+
+        <br/>
+        {{form.password.label}}
+        {{form.password(class="form-control")}}
+
+        <br/>
+        {{form.longtitude.label}}
+        {{form.longtitude(class="form-control")}}
+
+        <br/>
+        {{form.latitude.label}}
+        {{form.latitude(class="form-control")}}
+
+        <br/>
+        {{form.submit}}
+    </form>
+    </div>
 
 
 {% endblock %}
