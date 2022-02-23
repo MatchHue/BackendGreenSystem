@@ -4,51 +4,35 @@
 
 {% block content%}
 
-    {{form.hidden_tag()}}
-    {{form.image()}}
-    <form action="/list_items" enctype="multipart/form-data" methods="POST">
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+    <div class="shadow p-3 mb-5 bg-white rounded">
+      <form method="POST" enctype="multipart/form-data">
+          {{form.hidden_tag()}}
 
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-
-        <label>Item Image</label>
-        <div class="input-group mb-3">
-            <input type="file" class="form-control" name="pic" id="inputGroupFile02" >
-            <label class="input-group-text" for="inputGroupFile02">Upload</label>
-        </div>
-        
-        <div class="col">
-            <input type="text" class="form-control" placeholder="Item Name" name="Item Name"aria-label="Item Name">
-          </div>
+          {{form.image(class="form-control")}}
+          <br/>
+          {{form.name(class="form-control",placeholder="Item Name")}}
 
           <br/>
-
-        <div class="row g-3">
-            <div class="col">
-              <input type="number" class="form-control" placeholder="Quantity in kg" name="Quantity" aria-label="Quantity">
+          <p>Item Information</p>
+          <div class="row g-3">
+              <div class="col">
+                  {{form.quantity(class="form-control",  placeholder="Quantity in KG")}}
+              </div>
+              <div class="col">
+                  {{form.price(class="form-control",placeholder="Price per KG")}}
+              </div>
             </div>
-            <div class="col">
-              <input type="number" class="form-control" placeholder="Price per kg" name="Price" aria-label="Price">
-            </div>
-          </div>
 
           <br/>
-          <label class="visually-hidden" for="specificSizeSelect">Delivery Option</label>
-            <select class="form-select" name="Delivery" id="specificSizeSelect">
-            <option selected>Delivery Option...</option>
-            <option value="1">Choose to Deliver</option>
-            <option value="2">Have customer Pickup </option>
-            </select>
-
-            <br/>
-        <input type="submit" name="Submit" class="btn btn-primary" />
-
-
-    </form>
-
-
+            {{form.delivery(class="form-control")}}
+          <br/>
+          {{form.submit}}
+      </form>
+      </div>
 
 
 {% endblock %}

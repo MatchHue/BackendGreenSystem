@@ -1,10 +1,12 @@
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, FileField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
+import os
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
@@ -40,10 +42,10 @@ class SignUpForm(FlaskForm):
 
 class ItemForm(FlaskForm):
     name=StringField("Username",validators=[DataRequired()])
-    image=FileField("Upload",validators=[DataRequired()])
-    image_name=StringField("Image Name", validators=[DataRequired()])
+    image=FileField(label="image",validators=[FileAllowed(['jpg','png'])])
     quantity=DecimalField("Quantity",validators=[DataRequired()])
     price=DecimalField("Price",validators=[DataRequired()])
+    delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
     
 
@@ -83,13 +85,13 @@ class User(db.Model,UserMixin):
 
 class Item(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
+    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))s
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
-    image_name=db.Column(db.String,nullable=False)
-    mimetype=db.Column(db.String,nullable=False)
-    quantity=db.Column(db.Integer,nullable=False)
-    price=db.Column(db.Integer,nullable=False)
+    #image_name=db.Column(db.String,nullable=False)
+    #mimetype=db.Column(db.String,nullable=False)
+    quantity=db.Column(db.Numeric,nullable=False)
+    price=db.Column(db.Numeric,nullable=False)
     delivery=db.Column(db.String,nullable=False)
     #cart_items=db.relationship('Item',backref='item')
 
@@ -103,9 +105,6 @@ class Item(db.Model):
             'price':self.price
         }
 
-class Cart(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    item_id=db.Column(db.Integer,db.ForeignKey('item.id'))
 
 
 
@@ -198,22 +197,28 @@ def get_user_items():
 }
     return user_item
 
-@app.route('/list_items',methods=['POST','GET'])
+
+def saveimage(picture_file):
+    picture=picture_file.filename
+    picture_path=os.path.join(app.root_path,'static/item_images',picture)
+    picture_file.save(picture_path)
+    return picture
+
+@app.route('/list_items',methods=['GET','POST'])
 #@login_required
 def list_items():
-    if request.method=='POST':
-        data=request.form
-        picture=request.files['pic']
-        mimetype=picture.mimetype
-        newItem=Item(name=data['Item Name'],image=picture.read(),image_name=picture.filename,mimetype=mimetype,
-        quantity=data['Quantity'],price=data['Price'],delivery=data['Delivery'])
-        img=Item(image=picture.read(),mimetype=mimetype,image_name=picture.filename)
-        db.seession.add(newItem)
+    form=ItemForm()
+    if form.validate_on_submit():
+        image_file=saveimage(form.image.data)
+        print(image_file)
+        newItem=Item(name=form.name.data,image=image_file,quantity=form.quantity.data,price=form.price.data,
+        delivery=form.delivery.data)
+        db.session.add(newItem)
         db.session.commit()
         return redirect(url_for('index'))
-    else:
-        form=ItemForm()
-        return render_template('listitem.html',form=form)
+
+    return render_template('listitem.html',form=form)
+
 
 @app.route('/rate_user',methods=['POST'])
 #@login_required
