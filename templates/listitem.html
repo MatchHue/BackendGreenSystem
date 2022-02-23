@@ -4,8 +4,9 @@
 
 {% block content%}
 
-
-    <form action="/list_items" methods="POST">
+    {{form.hidden_tag()}}
+    {{form.image()}}
+    <form action="/list_items" enctype="multipart/form-data" methods="POST">
 
         <br/>
         <br/>

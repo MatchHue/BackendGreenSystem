@@ -1,7 +1,7 @@
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField
+from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, FileField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
@@ -40,6 +40,11 @@ class SignUpForm(FlaskForm):
 
 class ItemForm(FlaskForm):
     name=StringField("Username",validators=[DataRequired()])
+    image=FileField("Upload",validators=[DataRequired()])
+    image_name=StringField("Image Name", validators=[DataRequired()])
+    quantity=DecimalField("Quantity",validators=[DataRequired()])
+    price=DecimalField("Price",validators=[DataRequired()])
+    submit=SubmitField("Add Item")
     
 
 
@@ -193,7 +198,7 @@ def get_user_items():
 }
     return user_item
 
-@app.route('/list_items',methods=['GET','POST'])
+@app.route('/list_items',methods=['POST','GET'])
 #@login_required
 def list_items():
     if request.method=='POST':
@@ -206,8 +211,9 @@ def list_items():
         db.seession.add(newItem)
         db.session.commit()
         return redirect(url_for('index'))
-        
-    return render_template('listitem.html')
+    else:
+        form=ItemForm()
+        return render_template('listitem.html',form=form)
 
 @app.route('/rate_user',methods=['POST'])
 #@login_required
