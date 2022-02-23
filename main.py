@@ -26,7 +26,7 @@ def load_user(user_id):
 
 class LoginForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
-    passowrd=PasswordField("Password",validators=[DataRequired()])
+    password=PasswordField("Password",validators=[DataRequired()])
     submit=SubmitField("Submit")
 
 class SignUpForm(FlaskForm):
@@ -43,8 +43,12 @@ class SignUpForm(FlaskForm):
 class User(db.Model,UserMixin):
     id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String,unique=True,nullable=False)
+    email=db.Column(db.String,unique=True,nullable=False)
+    phone_number=db.Column(db.Integer,unique=True)
     password=db.Column(db.String,nullable=False)
-    items=db.relationship('Item',backref='user')
+    longtitude=db.Column(db.Numeric,nullable=False)
+    latitude=db.Column(db.Numeric,nullable=False)
+    #items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
@@ -69,12 +73,12 @@ class User(db.Model,UserMixin):
 
 class Item(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
+    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Integer,nullable=False)
-    cart_items=db.relationship('Item',backref='item')
+    #cart_items=db.relationship('Item',backref='item')
 
 
     def toDict(self):
@@ -105,7 +109,11 @@ def testroute():
 def signup():
     form=SignUpForm()
     if form.validate_on_submit():
-        username=form.username.data
+        newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
+        phone_number=form.phone_number.data,
+        longtitude=form.longtitude.data,latitude=form.latitude.data)
+        db.session.add(newUser)
+        db.session.commit()
         form.username.data=''
     return render_template('signup.html',form=form)
 
