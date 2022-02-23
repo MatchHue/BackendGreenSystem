@@ -38,6 +38,11 @@ class SignUpForm(FlaskForm):
     latitude=DecimalField("latitude",validators=[DataRequired()])
     submit=SubmitField("Submit")
 
+class ItemForm(FlaskForm):
+    name=StringField("Username",validators=[DataRequired()])
+    
+
+
 #Models
 
 class User(db.Model,UserMixin):
@@ -76,6 +81,8 @@ class Item(db.Model):
     #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
+    image_name=db.Column(db.String,nullable=False)
+    mimetype=db.Column(db.String,nullable=False)
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Integer,nullable=False)
     #cart_items=db.relationship('Item',backref='item')
@@ -184,11 +191,14 @@ def get_user_items():
 }
     return user_item
 
-@app.route('/list_items',methods=['POST'])
+@app.route('/list_items',methods=['GET','POST'])
 #@login_required
 def list_items():
-    
-    return jsonify(message='Item created'),200
+    form=ItemForm()
+    if form.validate_on_submit():
+        return('200')
+
+    return render_template('listitem.html')
 
 @app.route('/rate_user',methods=['POST'])
 #@login_required

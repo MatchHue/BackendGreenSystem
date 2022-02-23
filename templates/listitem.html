@@ -5,6 +5,49 @@
 {% block content%}
 
 
+    <form action="/list_items" methods="POST">
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+        <label>Item Image</label>
+        <div class="input-group mb-3">
+            <input type="file" class="form-control" id="inputGroupFile02" >
+            <label class="input-group-text" for="inputGroupFile02">Upload</label>
+        </div>
+        
+        <div class="col">
+            <input type="text" class="form-control" placeholder="Item Name" aria-label="Item Name">
+          </div>
+
+          <br/>
+
+        <div class="row g-3">
+            <div class="col">
+              <input type="number" class="form-control" placeholder="Quantity in kg" aria-label="Quantity">
+            </div>
+            <div class="col">
+              <input type="number" class="form-control" placeholder="Price per kg" aria-label="Price">
+            </div>
+          </div>
+
+          <br/>
+          <label class="visually-hidden" for="specificSizeSelect">Delivery Option</label>
+            <select class="form-select" id="specificSizeSelect">
+            <option selected>Delivery Option...</option>
+            <option value="1">Choose to Deliver</option>
+            <option value="2">Have customer Pickup </option>
+            </select>
+
+            <br/>
+        <input type="submit" name="Submit" class="btn btn-primary" />
+
+
+    </form>
+
+
 
 
 {% endblock %}
