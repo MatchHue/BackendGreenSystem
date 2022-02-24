@@ -29,7 +29,7 @@ def load_user(user_id):
 class LoginForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
     password=PasswordField("Password",validators=[DataRequired()])
-    submit=SubmitField("Submit")
+    submit=SubmitField("Login")
 
 class SignUpForm(FlaskForm):
     username=StringField("Username",validators=[DataRequired()])
@@ -112,7 +112,10 @@ class Item(db.Model):
 def index():
     users=User.query.all()
     items=Item.query.all()
-    return render_template('index.html',users=users,items=items)
+    images=[]
+    for item in items:
+        images.append(url_for('static',filename='item_images/+item.image'))
+    return render_template('index.html',users=users,items=items,images=images)
 
 @app.route('/test',methods=['GET'])
 def testroute():
@@ -135,13 +138,12 @@ def signup():
         return redirect(url_for('index'))
     return render_template('signup.html',form=form)
 
-@app.route('/login',methods=['POST'])
+@app.route('/login',methods=['POST','GET'])
 def login():
-    form=SignUpForm()
+    form=LoginForm()
     if form.validate_on_submit():
-        username=form.username.data
-        form.username.data=''
-    return render_template('signup.html',form=form)
+        return '<h1>' + form.email.data + ' '+form.password.data+ '</h1>'
+    return render_template('login.html',form=form)
 
 
 @app.route('/logout',methods=['GET','POST'])
@@ -205,7 +207,7 @@ def saveimage(picture_file):
     return picture
 
 @app.route('/list_items',methods=['GET','POST'])
-#@login_required
+@login_required
 def list_items():
     form=ItemForm()
     if form.validate_on_submit():
