@@ -23,6 +23,7 @@ a {
     height: 410px;
     margin: 6rem auto 8.1rem auto;
     width: 329px;
+
   }
   #card-content {
     padding: 12px 44px;
@@ -96,7 +97,9 @@ a {
     border: none;
     border-radius: 10px;
     width: 190px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom:10px;
+    height:100%;
 }
 
 .image-container {
