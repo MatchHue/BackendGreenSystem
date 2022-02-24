@@ -20,7 +20,7 @@ login_manager.login_view='login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users.query.get(int(user_id))
+    return User.query.get(int(user_id))
 
 
 
@@ -131,6 +131,7 @@ def signup():
             newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
             phone_number=form.phone_number.data,
             longtitude=form.longtitude.data,latitude=form.latitude.data)
+            newUser.set_password(newUser.password)
             db.session.add(newUser)
             db.session.commit()
         form.username.data=''
@@ -142,12 +143,19 @@ def signup():
 def login():
     form=LoginForm()
     if form.validate_on_submit():
-        return '<h1>' + form.email.data + ' '+form.password.data+ '</h1>'
+        user=User.query.filter_by(email=form.email.data).first()
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user)
+                flash("Logged In Successful")
+                return redirect(url_for('index'))
+            else:
+                flash("Incorrect Password")
     return render_template('login.html',form=form)
 
 
 @app.route('/logout',methods=['GET','POST'])
-#@login_required
+@login_required
 def logout():
     logout_user()
     flash("Succesfully Logged Out")
