@@ -2,7 +2,7 @@ from flask import Flask, render_template,request,redirect,url_for,redirect,jsoni
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField
+from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField,IntegerField,FloatField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
@@ -43,8 +43,8 @@ class SignUpForm(FlaskForm):
 class ItemForm(FlaskForm):
     name=StringField("Username",validators=[DataRequired()])
     image=FileField(label="image",validators=[FileAllowed(['jpg','png'])])
-    quantity=DecimalField("Quantity",validators=[DataRequired()])
-    price=DecimalField("Price",validators=[DataRequired()])
+    quantity=IntegerField("Quantity",validators=[DataRequired()])
+    price=FloatField("Price",validators=[DataRequired()])
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
     
