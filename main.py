@@ -7,18 +7,15 @@ from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
 import os
-from flask_simple_geoip import SimpleGeoIP
 
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 app.config['SECRET_KEY']='CharizardIsTheBestStarter'
-app.config.update(GEOIPIFY_API_KEY='at_fK21skNWFKsJzxSdjKIvKvpbc4IQU    ')
 
 db=SQLAlchemy(app)
 
 
-simple_geoip = SimpleGeoIP(app)
 
 
 #Login Setup
@@ -127,9 +124,7 @@ def index():
 
 @app.route('/test',methods=['GET'])
 def testroute():
-    geoip_data = simple_geoip.get_geoip_data()
-    return geoip_data
-
+    return 'Hello'
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
