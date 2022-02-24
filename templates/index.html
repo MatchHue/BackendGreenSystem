@@ -5,33 +5,57 @@
 {{ super() }}
 
 {% block content %}
-    <h1>GREEN SYSTEM BACKEND</h1>
-    <p>Test to make sure GreenSystem is Hosted and Working</p>
-    <div class="container">
-        {% for user in users %}
-        <div>
-            {{user.username}}
-            {{user.email}}
-            {{user.password}}
-            {{user.phone_number}}
-            {{user.longtitude}}
-            {{user.latitude}}
+
+
+<!--------products-------->
+<!--<div class="small-container">
+    {% for item in items%}
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="/static/item_images/{{item.image}}" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title">{{item.name}}</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <a href="#" class="btn btn-primary">Go somewhere</a>
         </div>
+      </div>
+      {%endfor%}
+</div>-->
 
-        {% endfor%}
-
-    </div>
-
-    <div class="container">
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3">
             {% for item in items%}
-                {{item.name}}
-               {{item.image}}
-                {{item.price}}
-                {{item.quantity}}
-                {{item.delivery}}
+            <div class="card">
+                <div class="image-container">
+                    <div class="first">
+                        <div class="d-flex justify-content-between align-items-center"><span class="wishlist"><i class="fa fa-heart-o"></i></span> </div>
+                    </div> <img src="/static/item_images/{{item.image}}" class="img-fluid rounded thumbnail-image">
+                </div>
+                <div class="product-detail-container p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="Item Name">{{item.name}}</h5>
+                        <div class="d-flex flex-column mb-2"> <span class="new-price">${{item.price}} per KG</span>
+                            <small class="text-right">{{item.quantity}} KG Available</small></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center pt-1">
+                        <form>
+                            <div class="form-row">
+                              <div class="col">
+                                  <label style="margin-left:7.1em;">Quantity</label>
+                                  <br/>
+                                <input type="number" style="margin-left:5.7em;" style="width: 50px;" min="0" max="{{item.quantity}}" >
+                              </div>
+                              <br/>
+                              <button type="submit" style="margin-left:5.7em;"class="btn btn-primary btn-sm" >Add to Cart</button>
+                            </div>
+                          </form>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center pt-1">
+                    
+                    </div>
+                </div>
+            </div>
             {%endfor%}
 
-
-    </div>
-
+        </div>
 {% endblock %}

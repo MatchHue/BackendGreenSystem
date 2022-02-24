@@ -90,8 +90,8 @@ class Item(db.Model):
     image=db.Column(db.String,nullable=False)
     #image_name=db.Column(db.String,nullable=False)
     #mimetype=db.Column(db.String,nullable=False)
-    quantity=db.Column(db.Numeric,nullable=False)
-    price=db.Column(db.Numeric,nullable=False)
+    quantity=db.Column(db.Integer,nullable=False)
+    price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
     #cart_items=db.relationship('Item',backref='item')
 
