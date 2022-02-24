@@ -1,0 +1,47 @@
+{% extends "layout.html"%}
+
+
+{{super()}}
+
+
+{% block content %}
+
+    <br/>
+    <br/>
+    <br/>
+    
+    <div class="shadow p-3 mb-5 bg-white rounded">
+    <form method="POST">
+        {{form.hidden_tag()}}
+
+        {{form.email.label}}
+        {{form.email(class="form-control")}}
+        <br/>
+        {{form.username.label}}
+        {{form.username(class="form-control")}}
+
+        <br/>
+        {{form.password.label}}
+        {{form.password(class="form-control")}}
+        <br/>
+        {{form.phone_number.label}}
+        {{form.phone_number(class="form-control")}}
+
+        <br/>
+        <p>Location</p>
+        <div class="row g-3">
+            <div class="col">
+                {{form.longtitude(class="form-control",  placeholder="longtitude")}}
+            </div>
+            <div class="col">
+                {{form.latitude(class="form-control",placeholder="latitude")}}
+            </div>
+          </div>
+
+        <br/>
+        {{form.submit}}
+    </form>
+    </div>
+
+
+{% endblock %}

@@ -1,10 +1,12 @@
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField,IntegerField,FloatField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
+import os
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
@@ -18,7 +20,7 @@ login_manager.login_view='login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users.query.get(int(user_id))
+    return User.query.get(int(user_id))
 
 
 
@@ -26,16 +28,39 @@ def load_user(user_id):
 
 class LoginForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
-    passowrd=PasswordField("Password",validators=[DataRequired()])
+    password=PasswordField("Password",validators=[DataRequired()])
+    submit=SubmitField("Login")
+
+class SignUpForm(FlaskForm):
+    username=StringField("Username",validators=[DataRequired()])
+    email=EmailField("Email",validators=[DataRequired()])
+    phone_number=StringField("Contact",validators=[DataRequired()])
+    password=PasswordField("Password",validators=[DataRequired()])
+    longtitude=DecimalField("longtitude",validators=[DataRequired()])
+    latitude=DecimalField("latitude",validators=[DataRequired()])
     submit=SubmitField("Submit")
+
+class ItemForm(FlaskForm):
+    name=StringField("Username",validators=[DataRequired()])
+    image=FileField(label="image",validators=[FileAllowed(['jpg','png'])])
+    quantity=IntegerField("Quantity",validators=[DataRequired()])
+    price=FloatField("Price",validators=[DataRequired()])
+    delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
+    submit=SubmitField("Add Item")
+    
+
 
 #Models
 
 class User(db.Model,UserMixin):
     id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String,unique=True,nullable=False)
+    email=db.Column(db.String,unique=True,nullable=False)
+    phone_number=db.Column(db.Integer,unique=True)
     password=db.Column(db.String,nullable=False)
-    items=db.relationship('Item',backref='user')
+    longtitude=db.Column(db.Numeric,nullable=False)
+    latitude=db.Column(db.Numeric,nullable=False)
+    #items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
@@ -60,12 +85,15 @@ class User(db.Model,UserMixin):
 
 class Item(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
+    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))s
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
+    #image_name=db.Column(db.String,nullable=False)
+    #mimetype=db.Column(db.String,nullable=False)
     quantity=db.Column(db.Integer,nullable=False)
-    price=db.Column(db.Integer,nullable=False)
-    cart_items=db.relationship('Item',backref='item')
+    price=db.Column(db.Float,nullable=False)
+    delivery=db.Column(db.String,nullable=False)
+    #cart_items=db.relationship('Item',backref='item')
 
 
     def toDict(self):
@@ -77,32 +105,57 @@ class Item(db.Model):
             'price':self.price
         }
 
-class Cart(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    item_id=db.Column(db.Integer,db.ForeignKey('item.id'))
 
 
 
 @app.route('/',methods=['GET'])
 def index():
-    return render_template('index.html')
+    users=User.query.all()
+    items=Item.query.all()
+    images=[]
+    for item in items:
+        images.append(url_for('static',filename='item_images/+item.image'))
+    return render_template('index.html',users=users,items=items,images=images)
 
 @app.route('/test',methods=['GET'])
 def testroute():
     return "<p1>TEST<p1>"
 
 
-@app.route('/signup',methods=['POST'])
+@app.route('/signup',methods=['GET','POST'])
 def signup():
-    return jsonify(message="User Created"),200
+    form=SignUpForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
+            phone_number=form.phone_number.data,
+            longtitude=form.longtitude.data,latitude=form.latitude.data)
+            newUser.set_password(newUser.password)
+            db.session.add(newUser)
+            db.session.commit()
+        form.username.data=''
+        form.email.data=''
+        return redirect(url_for('index'))
+    return render_template('signup.html',form=form)
 
-@app.route('/login',methods=['POST'])
+@app.route('/login',methods=['POST','GET'])
 def login():
-    return jsonify(message="Login Successful"),200
+    form=LoginForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user)
+                flash("Logged In Successful")
+                return redirect(url_for('index'))
+            else:
+                flash("Incorrect Password")
+    return render_template('login.html',form=form)
 
 
 @app.route('/logout',methods=['GET','POST'])
-#@login_required
+@login_required
 def logout():
     logout_user()
     flash("Succesfully Logged Out")
@@ -154,11 +207,28 @@ def get_user_items():
 }
     return user_item
 
-@app.route('/list_items',methods=['POST'])
-#@login_required
+
+def saveimage(picture_file):
+    picture=picture_file.filename
+    picture_path=os.path.join(app.root_path,'static/item_images',picture)
+    picture_file.save(picture_path)
+    return picture
+
+@app.route('/list_items',methods=['GET','POST'])
+@login_required
 def list_items():
-    
-    return jsonify(message='Item created'),200
+    form=ItemForm()
+    if form.validate_on_submit():
+        image_file=saveimage(form.image.data)
+        print(image_file)
+        newItem=Item(name=form.name.data,image=image_file,quantity=form.quantity.data,price=form.price.data,
+        delivery=form.delivery.data)
+        db.session.add(newItem)
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    return render_template('listitem.html',form=form)
+
 
 @app.route('/rate_user',methods=['POST'])
 #@login_required

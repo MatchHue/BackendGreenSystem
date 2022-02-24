@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{{super()}}
+
+
+
+{% block content%}
+
+
+
+
+<div id="card">
+    <div id="card-content">
+      <div id="card-title">
+        <h2>LOGIN</h2>
+        <div class="underline-title"></div>
+      </div>
+      <form method='POST' class="form">
+        {{form.hidden_tag()}}
+        <br/>
+        {{form.email.label}}
+        {{form.email(class="form-control")}}
+        <br/>
+        <div class="form-border"></div>
+        <br/>
+        {{form.password.label}}
+        {{form.password(class="form-control")}}
+        <br/>
+        <div class="form-border"></div>
+        <br/>
+        <div class="container bg-light">
+            <div class="col-md-12 text-center">
+         {{form.submit(class="btn btn-primary")}}
+            </div>
+            <a href="/signup" style="text-align:center;display:block;" id="signup">Don't have account yet?</a>
+      </form>
+    </div>
+  </div>
+
+
+{% endblock %}
+
