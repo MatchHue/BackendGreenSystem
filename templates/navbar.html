@@ -28,8 +28,13 @@
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
-        <a href="/login" style="margin-left:2.5em" methods="GET" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Login</a>
+
+       
+        {% if current_user.is_authenticated %}
         <a href="/logout" style="margin-left:2.5em" methods="GET" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Logout</a>
+        {%else%}
+        <a href="/login" style="margin-left:2.5em" methods="GET" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Login</a>
+        {%endif%}
       </div>
     </div>
   </nav>
