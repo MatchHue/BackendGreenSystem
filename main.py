@@ -476,5 +476,13 @@ def map():
             }}
     return locations
 
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart(product_id):
+    product = item.query.filter(item.id == product_id)
+    cart_item = CartItem(product=product)
+    db.session.add(cart_item)
+    db.session.commit()
+
+
 if __name__=="__main__":
     app.run(debug=True)
