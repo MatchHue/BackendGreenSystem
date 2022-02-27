@@ -1,3 +1,4 @@
+import json
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -7,11 +8,17 @@ from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
 import os
+import requests
+
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 app.config['SECRET_KEY']='CharizardIsTheBestStarter'
+
 db=SQLAlchemy(app)
+
+
+
 
 #Login Setup
 login_manager=LoginManager()
@@ -22,8 +29,7 @@ login_manager.login_view='login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
-
+locationdata='http://ip-api.com/json/'
 
 
 class LoginForm(FlaskForm):
@@ -117,9 +123,11 @@ def index():
         images.append(url_for('static',filename='item_images/+item.image'))
     return render_template('index.html',users=users,items=items,images=images)
 
-@app.route('/test',methods=['GET'])
+@app.route('/get_location_data',methods=['GET'])
 def testroute():
-    return "<p1>TEST<p1>"
+    response=requests.get("http://ip-api.com/json/")
+    data=response.json()
+    return data
 
 
 @app.route('/signup',methods=['GET','POST'])

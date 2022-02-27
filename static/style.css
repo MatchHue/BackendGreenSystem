@@ -298,3 +298,11 @@ a {
     position: relative;
     bottom: 5px
 }
+
+
+.parent-div{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+}
