@@ -10,7 +10,7 @@
     <br/>
     <br/>
     <div class="shadow p-3 mb-5 bg-white rounded">
-    <form method="POST">
+    <form method="POST", enctype="multipart/form-data">
         {{form.hidden_tag()}}
 
         {{form.email.label}}
@@ -18,6 +18,9 @@
         <br/>
         {{form.username.label}}
         {{form.username(class="form-control")}}
+        <br/>
+        <p>Profile Picture</p>
+        {{form.image(class="form-control")}}
 
         <br/>
         {{form.password.label}}

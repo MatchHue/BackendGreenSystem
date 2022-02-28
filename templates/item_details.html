@@ -25,7 +25,7 @@
             <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12">
                 <h2 class="name">
                     {{item.name}}
-                    <small>Product by <a href="javascript:void(0);">{{item.user.username}}</a></small>
+                    <small>Product by <a href="/get_user_items/{{item.user.id}}");">{{item.user.username}}</a></small>
                     <i class="fa fa-star fa-2x text-primary"></i>
                     <i class="fa fa-star fa-2x text-primary"></i>
                     <i class="fa fa-star fa-2x text-primary"></i>
@@ -44,7 +44,7 @@
                 <div class="certified">
                     <ul>
                         <li>
-                            <a href="javascript:void(0);">Item being<span>{{item.delivery}}</span></a>
+                            <a href="javascript:void(0);">Item Status<span>{{item.delivery}}</span></a>
                         </li>
                         <li>
                             <a href="javascript:void(0);">Certified<span>Quality Assured</span></a>
@@ -58,8 +58,10 @@
                       <label for="inputPassword2" class="sr-only">Quantity</label>
                       <input type="number" style="width: 300px;" min="1" max="{{item.quantity}}" class="form-control" id="quantity" placeholder="Quantity">
                     </div>
-                    <button type="submit" action="/addToCart/{{item.id}}" class="btn btn-primary mb-2">Add to Cart</button>
-                  </form>
+                    <div style="margin-left: 20%;">
+                    <button type="submit"  action="/addToCart/{{item.id}}" class="btn btn-primary mb-2">Add to Cart</button>
+                    </div>
+                </form>
                 </div>
             </div>
         </div>

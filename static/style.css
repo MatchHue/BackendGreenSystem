@@ -1,3 +1,17 @@
+
+.new-container{
+    max-width: 1300px;
+    margin: auto;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+
+h2{
+  text-align: left;
+  color: #000000;
+}
+
 a {
     text-decoration: none;
   }

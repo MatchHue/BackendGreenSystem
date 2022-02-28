@@ -20,8 +20,17 @@
       </div>
       {%endfor%}
 </div>-->
-
-<div class='container-fluid'>
+<div class="header" style="text-align: center; transform:translateX(38%);">
+    <div class="new-container" style="align-items: flex-end;">
+        <div class="row">
+            <div class="col-2">
+                <h1>Shopping Made Easier</h1>
+                <p>Finding fresh produce is now easier and quicker than ever</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class='container'>
     <div class="row">
     {% for item in items%}
     <div class="col">
@@ -29,7 +38,7 @@
         <div class="card-body text-center mx-auto">
             <div class='cvp'>
                 <h5 class="card-title font-weight-bold">{{item.name}}</h5>
-                <p class="card-text">${{item.price}}</p> <p class="card-text">{{item.quantity}}kg Available</p><a href="/item_details/{{item.id}}" class="btn btn-primary btn-sm active">view details</a><br />
+                <p class="card-text">${{item.price}} per kg</p> <p class="card-text">{{item.quantity}}kg Available</p><a href="/item_details/{{item.id}}" class="btn btn-primary btn-sm active">view details</a><br />
             </div>
         </div>
     </div>
@@ -38,6 +47,10 @@
     {%endfor%}
 </div>
 </div>
+
+<hr/>
+
+
 
 
 

@@ -1,6 +1,6 @@
 import json
 from unicodedata import numeric
-from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
+from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -43,6 +43,7 @@ class LoginForm(FlaskForm):
 
 class SignUpForm(FlaskForm):
     username=StringField("Username",validators=[DataRequired()])
+    image=FileField(label="image",validators=[FileAllowed(['jpg','png'])])
     email=EmailField("Email",validators=[DataRequired()])
     phone_number=StringField("Contact",validators=[DataRequired()])
     password=PasswordField("Password",validators=[DataRequired()])
@@ -63,6 +64,7 @@ class ItemForm(FlaskForm):
 class User(db.Model,UserMixin):
     id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String,unique=True,nullable=False)
+    pfp=db.Column(db.String,nullable=False)
     email=db.Column(db.String,unique=True,nullable=False)
     phone_number=db.Column(db.Integer,unique=True)
     password=db.Column(db.String,nullable=False)
@@ -134,6 +136,12 @@ def testroute():
     return data
 
 
+def savepfp(picture_file):
+    picture=picture_file.filename
+    picture_path=os.path.join(app.root_path,'static/pfp',picture)
+    picture_file.save(picture_path)
+    return picture
+
 @app.route('/signup',methods=['GET','POST'])
 def signup():
     location=getlocation()
@@ -143,7 +151,8 @@ def signup():
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
         if user is None:
-            newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
+            profile_image=savepfp(form.image.data)
+            newUser=User(username=form.username.data,pfp=profile_image,email=form.email.data,password=form.password.data,
             phone_number=form.phone_number.data,
             longtitude=lon,latitude=lat)
             newUser.set_password(newUser.password)
@@ -179,48 +188,15 @@ def logout():
 @app.route('/get_all_users',methods=['GET'])
 def get_all_users():
 
-    users=[{
-        "id":1,
-        "email": "marc123@mail.com",
-        "username":"Marc"
-    },
-    {
-        "id":2,
-        "email": "matthew234@mail.com",
-        "username":"Matthew"   
-    },
-    {
-        "id":3,
-        "email":"michael567@mail.com",
-        "username":"Michael"
-    }]
-    return jsonify(users)
+    users=User.query.all()
+    return users
 
 
-@app.route('/get_user_items',methods=['GET'])
-def get_user_items():
-    user_item= {
-    "user_id": 2,
-    "email": "matthew234@mail.com",
-    "username": "Matthew",
-    "items": [
-        {
-            "item_id": 1,
-            "name": "pumpkin",
-            "price": "6$ per pound",
-            "image": "pumpkin.png",
-            "quantity": "40lbs"
-        },
-        {
-            "item_id": 2,
-            "name": "mango",
-            "price": "$3 per",
-            "image": "mango.png",
-            "quantity": 20
-        }
-    ]
-}
-    return user_item
+@app.route('/get_user_items/<int:id>',methods=['GET'])
+def get_user_items(id):
+    user=User.query.filter(id==id).first()
+    items=user.items
+    return render_template('user_items.html',user=user,items=items)
 
 
 def saveimage(picture_file):

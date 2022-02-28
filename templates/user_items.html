@@ -1,0 +1,21 @@
+{% extends 'layout.html'%}
+
+{{super()}}
+
+
+
+{% block content%}
+
+
+<p>{{user.username}}</p>
+<div>
+   {%for item in user.items%}
+    {{item.name}}
+    <br/>
+   {%endfor%}
+</div>
+
+
+
+
+{%endblock%}
