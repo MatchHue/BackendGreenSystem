@@ -476,14 +476,19 @@ def order_list():
 def confirm_order():
     return jsonify(message='Order Confirmed')
 
+
+
 @app.route('/map',methods=['GET'])
 def map():
-    locations= {
-            "location": {
-                "longitude ": 10.643411,
-                "latitude": -61.400344
-            }}
-    return locations
+
+    map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
+    users=User.query.all()
+    for user in users:
+        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location "
+
+        ).add_to(map)
+    
+    return map._repr_html_()
 
 if __name__=="__main__":
     app.run(debug=True)
