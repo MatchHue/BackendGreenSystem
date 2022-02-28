@@ -34,5 +34,13 @@
       </form>
       </div>
 
+    {% for product in products %}
+      <div class="product-item">
+        <h3>{{ product.name }}</h3>
+        <img src="static/item_images/{{ lettuce.jpg }}" alt="" width="200px" height="200px">
+
+      </div>
+
+    {% endfor %}
 
 {% endblock %}

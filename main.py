@@ -93,7 +93,7 @@ class Item(db.Model):
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
-    #cart_items=db.relationship('Item',backref='item')
+    cart_items=db.relationship('CartItem', backref='item')
 
 
     def toDict(self):
@@ -105,6 +105,9 @@ class Item(db.Model):
             'price':self.price
         }
 
+class CartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('item.id'))
 
 
 
@@ -389,16 +392,23 @@ def get_item_detail():
     }
     return item_details
 
-@app.route('/add_to_cart',methods=['POST'])
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart(product_id):
+    product = item.query.filter(item.id == product_id)
+    cart_item = CartItem(product=product)
+    db.session.add(cart_item)
+    db.session.commit()
+
+#@app.route('/add_to_cart',methods=['POST'])
 #@login_required
-def add_to_cart():
-    cart={
-    "item_id": 1,
-    "name": "mango",
-    "price": "$3 per",
-    "image": "mango.png",
-    "quantity": 5
-    }
+#def add_to_cart():
+#    cart={
+#    "item_id": 1,
+#    "name": "mango",
+#    "price": "$3 per",
+#    "image": "mango.png",
+#    "quantity": 5
+#    }
 
     return jsonify(message='Item added'),cart
 
@@ -475,14 +485,6 @@ def map():
                 "latitude": -61.400344
             }}
     return locations
-
-@app.route('/add_to_cart', methods=['POST'])
-def add_to_cart(product_id):
-    product = item.query.filter(item.id == product_id)
-    cart_item = CartItem(product=product)
-    db.session.add(cart_item)
-    db.session.commit()
-
 
 if __name__=="__main__":
     app.run(debug=True)
