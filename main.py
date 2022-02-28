@@ -1,6 +1,6 @@
 import json
 from unicodedata import numeric
-from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
+from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -194,8 +194,9 @@ def get_all_users():
 
 @app.route('/get_user_items/<int:id>',methods=['GET'])
 def get_user_items(id):
-    user=User.query.get(id)
-    return render_template('user_items.html',user=user)
+    user=User.query.filter(id==id).first()
+    items=user.items
+    return render_template('user_items.html',user=user,items=items)
 
 
 def saveimage(picture_file):
