@@ -4,6 +4,7 @@ from flask import Flask, render_template,request,redirect,url_for,redirect,jsoni
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+import idna
 from sqlalchemy import Numeric
 from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField,IntegerField,FloatField
 from wtforms.validators import DataRequired, EqualTo, Length
@@ -243,6 +244,11 @@ def list_items():
         return redirect(url_for('index'))
 
     return render_template('listitem.html',form=form)
+
+@app.route('/item_details/<int:id>',methods=['GET'])
+def item_details(id):
+    item=Item.query.get(id)
+    return render_template('item_details.html',item=item)
 
 
 @app.route('/rate_user',methods=['POST'])
