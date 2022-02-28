@@ -43,6 +43,7 @@ class LoginForm(FlaskForm):
 
 class SignUpForm(FlaskForm):
     username=StringField("Username",validators=[DataRequired()])
+    image=FileField(label="image",validators=[FileAllowed(['jpg','png'])])
     email=EmailField("Email",validators=[DataRequired()])
     phone_number=StringField("Contact",validators=[DataRequired()])
     password=PasswordField("Password",validators=[DataRequired()])
@@ -63,6 +64,7 @@ class ItemForm(FlaskForm):
 class User(db.Model,UserMixin):
     id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String,unique=True,nullable=False)
+    pfp=db.Column(db.String,nullable=False)
     email=db.Column(db.String,unique=True,nullable=False)
     phone_number=db.Column(db.Integer,unique=True)
     password=db.Column(db.String,nullable=False)
@@ -134,6 +136,12 @@ def testroute():
     return data
 
 
+def savepfp(picture_file):
+    picture=picture_file.filename
+    picture_path=os.path.join(app.root_path,'static/pfp',picture)
+    picture_file.save(picture_path)
+    return picture
+
 @app.route('/signup',methods=['GET','POST'])
 def signup():
     location=getlocation()
@@ -143,7 +151,8 @@ def signup():
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
         if user is None:
-            newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
+            profile_image=savepfp(form.image.data)
+            newUser=User(username=form.username.data,pfp=profile_image,email=form.email.data,password=form.password.data,
             phone_number=form.phone_number.data,
             longtitude=lon,latitude=lat)
             newUser.set_password(newUser.password)
