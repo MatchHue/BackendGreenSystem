@@ -1,8 +1,10 @@
 import json
+from unicodedata import numeric
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from sqlalchemy import Numeric
 from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField,IntegerField,FloatField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -43,8 +45,6 @@ class SignUpForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
     phone_number=StringField("Contact",validators=[DataRequired()])
     password=PasswordField("Password",validators=[DataRequired()])
-    longtitude=DecimalField("longtitude",validators=[DataRequired()])
-    latitude=DecimalField("latitude",validators=[DataRequired()])
     submit=SubmitField("Submit")
 
 class ItemForm(FlaskForm):
@@ -114,6 +114,10 @@ class Item(db.Model):
 
 
 
+def getlocation():
+    response=requests.get("http://ip-api.com/json/")
+    data=response.json()
+    return data
 
 @app.route('/',methods=['GET'])
 def index():
@@ -133,20 +137,23 @@ def testroute():
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
+    location=getlocation()
     form=SignUpForm()
+    lat=float(location['lat'])
+    lon=float(location['lon'])
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
         if user is None:
             newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
             phone_number=form.phone_number.data,
-            longtitude=form.longtitude.data,latitude=form.latitude.data)
+            longtitude=lon,latitude=lat)
             newUser.set_password(newUser.password)
             db.session.add(newUser)
             db.session.commit()
         form.username.data=''
         form.email.data=''
         return redirect(url_for('index'))
-    return render_template('signup.html',form=form)
+    return render_template('signup.html',form=form,lat=lat,lon=lon)
 
 @app.route('/login',methods=['POST','GET'])
 def login():
