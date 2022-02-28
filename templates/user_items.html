@@ -8,10 +8,10 @@
 
 
 <p>{{user.username}}</p>
-<p>{{user.items}}</p>
 <div>
    {%for item in user.items%}
-    {{item.image}}
+    {{item.name}}
+    <br/>
    {%endfor%}
 </div>
 
