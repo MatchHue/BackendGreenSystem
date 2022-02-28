@@ -58,8 +58,10 @@
                       <label for="inputPassword2" class="sr-only">Quantity</label>
                       <input type="number" style="width: 300px;" min="1" max="{{item.quantity}}" class="form-control" id="quantity" placeholder="Quantity">
                     </div>
-                    <button type="submit" action="/addToCart/{{item.id}}" class="btn btn-primary mb-2">Add to Cart</button>
-                  </form>
+                    <div style="margin-left: 20%;">
+                    <button type="submit"  action="/addToCart/{{item.id}}" class="btn btn-primary mb-2">Add to Cart</button>
+                    </div>
+                </form>
                 </div>
             </div>
         </div>
