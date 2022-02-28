@@ -392,6 +392,11 @@ def get_item_detail():
     }
     return item_details
 
+@app.route('/cart',methods=['GET'])
+def car():
+    items=Item.query.all()
+    return render_template('cart.html',items=items)
+
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart(product_id):
     product = item.query.filter(item.id == product_id)
