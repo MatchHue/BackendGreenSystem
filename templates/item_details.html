@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block content%}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+<div class="container">
+    <div class="product-content product-wrap clearfix product-deatil">
+        <div class="row">
+            <div class="col-md-5 col-sm-12 col-xs-12">
+                <div class="product-image">
+                    <div id="myCarousel-2" class="carousel slide">
+                        <ol class="carousel-indicators">
+                            <li data-target="#myCarousel-2" data-slide-to="0" class=""></li>
+                            <li data-target="#myCarousel-2" data-slide-to="1" class="active"></li>
+                            <li data-target="#myCarousel-2" data-slide-to="2" class=""></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="item">
+                                <img src="/static/item_images/{{item.image}}" class="mx-auto img-thumbnail" alt="{{item.name}}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12">
+                <h2 class="name">
+                    {{item.name}}
+                    <small>Product by <a href="javascript:void(0);">{{item.user.username}}</a></small>
+                    <i class="fa fa-star fa-2x text-primary"></i>
+                    <i class="fa fa-star fa-2x text-primary"></i>
+                    <i class="fa fa-star fa-2x text-primary"></i>
+                    <i class="fa fa-star fa-2x text-primary"></i>
+                    <i class="fa fa-star fa-2x text-muted"></i>
+                </h2>
+                <hr />
+                <h3 class="price-container">
+                    ${{item.price}}
+                    <small>per KG</small>
+                </h3>
+                <h3 class="price-container">
+                    {{item.quantity}}
+                    <small>KG Available</small>
+                </h3>
+                <div class="certified">
+                    <ul>
+                        <li>
+                            <a href="javascript:void(0);">Item being<span>{{item.delivery}}</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">Certified<span>Quality Assured</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <hr />
+
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                      <label for="inputPassword2" class="sr-only">Quantity</label>
+                      <input type="number" style="width: 300px;" min="1" max="{{item.quantity}}" class="form-control" id="quantity" placeholder="Quantity">
+                    </div>
+                    <button type="submit" action="/addToCart/{{item.id}}" class="btn btn-primary mb-2">Add to Cart</button>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{%endblock%}

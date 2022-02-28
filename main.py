@@ -1,14 +1,18 @@
 import json
+from unicodedata import numeric
 from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+import idna
+from sqlalchemy import Numeric
 from wtforms import StringField,SubmitField, PasswordField, BooleanField, ValidationError,EmailField, DecimalField, SelectField,IntegerField,FloatField
 from wtforms.validators import DataRequired, EqualTo, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
 import os
 import requests
+import folium
 
 
 app=Flask(__name__)
@@ -42,8 +46,6 @@ class SignUpForm(FlaskForm):
     email=EmailField("Email",validators=[DataRequired()])
     phone_number=StringField("Contact",validators=[DataRequired()])
     password=PasswordField("Password",validators=[DataRequired()])
-    longtitude=DecimalField("longtitude",validators=[DataRequired()])
-    latitude=DecimalField("latitude",validators=[DataRequired()])
     submit=SubmitField("Submit")
 
 class ItemForm(FlaskForm):
@@ -66,7 +68,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String,nullable=False)
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
-    #items=db.relationship('Item',backref='user')
+    items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
@@ -91,11 +93,9 @@ class User(db.Model,UserMixin):
 
 class Item(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))s
+    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
-    #image_name=db.Column(db.String,nullable=False)
-    #mimetype=db.Column(db.String,nullable=False)
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
@@ -113,6 +113,10 @@ class Item(db.Model):
 
 
 
+def getlocation():
+    response=requests.get("http://ip-api.com/json/")
+    data=response.json()
+    return data
 
 @app.route('/',methods=['GET'])
 def index():
@@ -132,20 +136,23 @@ def testroute():
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
+    location=getlocation()
     form=SignUpForm()
+    lat=float(location['lat'])
+    lon=float(location['lon'])
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
         if user is None:
             newUser=User(username=form.username.data,email=form.email.data,password=form.password.data,
             phone_number=form.phone_number.data,
-            longtitude=form.longtitude.data,latitude=form.latitude.data)
+            longtitude=lon,latitude=lat)
             newUser.set_password(newUser.password)
             db.session.add(newUser)
             db.session.commit()
         form.username.data=''
         form.email.data=''
         return redirect(url_for('index'))
-    return render_template('signup.html',form=form)
+    return render_template('signup.html',form=form,lat=lat,lon=lon)
 
 @app.route('/login',methods=['POST','GET'])
 def login():
@@ -227,15 +234,21 @@ def saveimage(picture_file):
 def list_items():
     form=ItemForm()
     if form.validate_on_submit():
+        lister=current_user.id
         image_file=saveimage(form.image.data)
         print(image_file)
         newItem=Item(name=form.name.data,image=image_file,quantity=form.quantity.data,price=form.price.data,
-        delivery=form.delivery.data)
+        delivery=form.delivery.data,user_id=lister)
         db.session.add(newItem)
         db.session.commit()
         return redirect(url_for('index'))
 
     return render_template('listitem.html',form=form)
+
+@app.route('/item_details/<int:id>',methods=['GET'])
+def item_details(id):
+    item=Item.query.get(id)
+    return render_template('item_details.html',item=item)
 
 
 @app.route('/rate_user',methods=['POST'])
@@ -475,14 +488,19 @@ def order_list():
 def confirm_order():
     return jsonify(message='Order Confirmed')
 
+
+
 @app.route('/map',methods=['GET'])
 def map():
-    locations= {
-            "location": {
-                "longitude ": 10.643411,
-                "latitude": -61.400344
-            }}
-    return locations
+
+    map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
+    users=User.query.all()
+    for user in users:
+        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location "
+
+        ).add_to(map)
+    
+    return map._repr_html_()
 
 if __name__=="__main__":
     app.run(debug=True)

@@ -27,18 +27,9 @@
         {{form.phone_number(class="form-control")}}
 
         <br/>
-        <p>Location</p>
-        <div class="row g-3">
-            <div class="col">
-                {{form.longtitude(class="form-control",  placeholder="longtitude")}}
-            </div>
-            <div class="col">
-                {{form.latitude(class="form-control",placeholder="latitude")}}
-            </div>
-          </div>
-
         <br/>
         {{form.submit}}
+        <a style="text-align:center;display:block;" id="Warning">Creating an account uses your current location</a>
     </form>
     </div>
 {% endblock %}
