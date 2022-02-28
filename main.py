@@ -67,7 +67,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String,nullable=False)
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
-    #items=db.relationship('Item',backref='user')
+    items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
@@ -92,11 +92,9 @@ class User(db.Model,UserMixin):
 
 class Item(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))s
+    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
-    #image_name=db.Column(db.String,nullable=False)
-    #mimetype=db.Column(db.String,nullable=False)
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
@@ -235,10 +233,11 @@ def saveimage(picture_file):
 def list_items():
     form=ItemForm()
     if form.validate_on_submit():
+        lister=current_user.id
         image_file=saveimage(form.image.data)
         print(image_file)
         newItem=Item(name=form.name.data,image=image_file,quantity=form.quantity.data,price=form.price.data,
-        delivery=form.delivery.data)
+        delivery=form.delivery.data,user_id=lister)
         db.session.add(newItem)
         db.session.commit()
         return redirect(url_for('index'))
