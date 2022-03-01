@@ -398,11 +398,27 @@ def car():
     return render_template('cart.html',items=items)
 
 @app.route('/add_to_cart', methods=['POST'])
-def add_to_cart(product_id):
-    product = item.query.filter(item.id == product_id)
-    cart_item = CartItem(product=product)
-    db.session.add(cart_item)
-    db.session.commit()
+def AddCart():
+    try:
+        product_id = request.form.get('product_id')
+        quantity = request.form.get('quantity')
+        if product_id and quantity and request.method == "POST":
+            DictItems = {product_id:{'name': item.name, 'price': item.price, 'quantity': item.quantity, 'image': item.image}}
+
+            if 'Shopcart' in session:
+                print(session['Shoppingcart'])
+            else: 
+                session['Shoppingcart'] = DictItems
+                return redirect(request.referrer)      
+    except Exception as e:
+        print(e)
+    finally:
+        return redirect(request.referrer)
+#def add_to_cart(product_id):
+#    product = item.query.filter(item.id == product_id)
+#    cart_item = CartItem(product=product)
+#    db.session.add(cart_item)
+#    db.session.commit()
 
 #@app.route('/add_to_cart',methods=['POST'])
 #@login_required
@@ -415,7 +431,7 @@ def add_to_cart(product_id):
 #    "quantity": 5
 #    }
 
-    return jsonify(message='Item added'),cart
+#return jsonify(message='Item added'),cart
 
 @app.route('/checkout',methods=['POST'])
 #@login_required
