@@ -40,7 +40,16 @@
                             <small class="text-right" style="margin-left:1m;">{{item.quantity}} KG Available</small></div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center pt-1">
-                        <form>
+                        
+                        <form action="{{url_for('AddCart')}}" method="POST">
+                            <input type="hidden" name="item_id" value="{{item.id}}">
+                            <button type="submit" style="margin-left:5.7em;" class="btn btn-primary btn-sm">Add to Cart</button>
+                            <label for="">Quantity</label>
+                            <input type="number" name="quantity" id="" min="0" max="{{item.quantity}}">
+                        </form>
+
+<!--
+                        <form action="{{url_for('AddCart')}}" method="POST">
                             <div class="form">
                               <div class="col">
                                   <label style="margin-left:7.1em;">Quantity</label>
@@ -48,9 +57,11 @@
                                 <input type="number" style="margin-left:5.7em;" style="width: 50px;" min="0" max="{{item.quantity}}" >
                               </div>
                               <br/>
-                              <button type="submit" style="margin-left:5.7em;"class="btn btn-primary btn-sm" >Add to Cart</button>
+                              <button type="submit" style="margin-left:5.7em;"
+                                        class="btn btn-primary btn-sm" href="{{url_for('AddCart')}}">Add to Cart</button>
                             </div>
                           </form>
+                        -->
                     </div>
                 </div>
             </div>

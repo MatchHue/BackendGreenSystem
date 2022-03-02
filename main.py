@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash
+from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -8,10 +8,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, login_manager, login_required, logout_user, current_user, LoginManager
 import os
 
+
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 app.config['SECRET_KEY']='CharizardIsTheBestStarter'
 db=SQLAlchemy(app)
+
 
 #Login Setup
 login_manager=LoginManager()
@@ -224,9 +226,13 @@ def list_items():
     if form.validate_on_submit():
         image_file=saveimage(form.image.data)
         print(image_file)
-        newItem=Item(name=form.name.data,image=image_file,quantity=form.quantity.data,price=form.price.data,
-        delivery=form.delivery.data)
+        newItem=Item(name=form.name.data,
+                    image=image_file,
+                    quantity=form.quantity.data,
+                    price=form.price.data,
+                    delivery=form.delivery.data)
         db.session.add(newItem)
+        flash(f'{name} has been added')
         db.session.commit()
         return redirect(url_for('index'))
 
@@ -392,21 +398,33 @@ def get_item_detail():
     }
     return item_details
 
-@app.route('/cart',methods=['GET'])
-def car():
-    items=Item.query.all()
-    return render_template('cart.html',items=items)
+
+
+
+def Dicts(dict1, dict2):
+    if isinstance(dict1, list) and isinstance(dict2, list):
+        return dict1 + dict2
+    elif isinstance(dict1, dict) and isinstance(dict2, dict):
+        return dict(list(dict1.items()) + list(dict2.items()))
+    return False
 
 @app.route('/add_to_cart', methods=['POST'])
 def AddCart():
     try:
-        product_id = request.form.get('product_id')
+        item_id = request.form.get('id')
         quantity = request.form.get('quantity')
-        if product_id and quantity and request.method == "POST":
-            DictItems = {product_id:{'name': item.name, 'price': item.price, 'quantity': item.quantity, 'image': item.image}}
-
-            if 'Shopcart' in session:
-                print(session['Shoppingcart'])
+        item = Item.query.filter_by(id=item_id).first()
+        if item_id and quantity and request.method == "POST":
+            DictItems = {item_id:{'name': item.name,
+                                'price': item.price, 
+                                'quantity': item.quantity, 
+                                'image': item.image}}
+            if 'Shoppingcart' in session:
+                if item_id in session['Shoppingcart']:
+                    print("This product is already in your cart")
+                else:
+                    session['Shoppingcart'] = Dicts(session['Shoppingcart'], DictItems)
+                    return redirect(request.referrer)
             else: 
                 session['Shoppingcart'] = DictItems
                 return redirect(request.referrer)      
@@ -414,6 +432,16 @@ def AddCart():
         print(e)
     finally:
         return redirect(request.referrer)
+
+@app.route('/cart',methods=['GET'])
+def car():
+    #items=Item.query.all()
+    if 'Shoppingcart' not in session:
+        return redirect(request.referrer)
+    #items=Item.query.all()
+    return render_template('cart.html',items=items)
+
+
 #def add_to_cart(product_id):
 #    product = item.query.filter(item.id == product_id)
 #    cart_item = CartItem(product=product)
