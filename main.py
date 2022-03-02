@@ -222,21 +222,28 @@ def saveimage(picture_file):
 @app.route('/list_items',methods=['GET','POST'])
 @login_required
 def list_items():
-    form=ItemForm()
-    if form.validate_on_submit():
-        image_file=saveimage(form.image.data)
-        print(image_file)
-        newItem=Item(name=form.name.data,
-                    image=image_file,
-                    quantity=form.quantity.data,
-                    price=form.price.data,
-                    delivery=form.delivery.data)
+    form = ItemForm(request.form)
+    if request.method == "POST":
+        name = form.name.data
+        price = form.price.data
+        quantity = form.quantity.data
+        image = image_file
+        newItem = ItemForm(name=name, price=price, quantity=quantity, image=image)
         db.session.add(newItem)
-        flash(f'{name} has been added')
+        flash(f'The product {name} has been added', 'success')
         db.session.commit()
         return redirect(url_for('index'))
+    return render_template('listitem.html', title="List Item Page", form=form)
+    #form=ItemForm()
+    #if form.validate_on_submit():
+        #image_file=saveimage(form.image.data)
+        #print(image_file)
+        #newItem=Item(name=form.name.data, image=image_file, quantity=form.quantity.data, price=form.price.data, delivery=form.delivery.data)
+        #db.session.add(newItem)
+        #db.session.commit()
+        #return redirect(url_for('index'))
 
-    return render_template('listitem.html',form=form)
+    #return render_template('listitem.html',form=form)
 
 
 @app.route('/rate_user',methods=['POST'])

@@ -2,32 +2,6 @@
 {% block content %}
 {{super()}}
 
-<div class="container">
-  <div class="row">
-    <table class="table table-sm">
-      <thead>
-        <th>Sr</th>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Subtotal</th>
-        <th>Update</th>
-        <th>Delete</th>
-      </thead>
-      <tbody>
-        {% for key , item in session['Shoppingcart'].items() %}
-        <tr>
-          <td>{{loop.index}}</td>
-          <td>{{item.name}}</td>
-          <td>{{item.price}}</td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
 
 <!--
 {% for item in items %}
