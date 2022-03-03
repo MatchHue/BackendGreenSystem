@@ -194,7 +194,7 @@ def get_all_users():
 
 @app.route('/get_user_items/<int:id>',methods=['GET'])
 def get_user_items(id):
-    user=User.query.filter(id==id).first()
+    user=User.query.get(id)
     items=user.items
     return render_template('user_items.html',user=user,items=items)
 
