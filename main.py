@@ -49,6 +49,12 @@ class ItemForm(FlaskForm):
     price=FloatField("Price",validators=[DataRequired()])
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
+
+class PurchaseItemForm(FlaskForm):
+    submit = SubmitField(label='Purchase Item!')
+
+class SellItemForm(FlaskForm):
+    submit = SubmitField(label='Sell Item!')
     
 
 
@@ -62,7 +68,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String,nullable=False)
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
-    #items=db.relationship('Item',backref='user')
+    items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
@@ -87,7 +93,6 @@ class User(db.Model,UserMixin):
 
 class Item(db.Model):
     id=db.Column(db.Integer,primary_key=True)
-    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))s
     name=db.Column(db.String,nullable=False)
     image=db.Column(db.String,nullable=False)
     #image_name=db.Column(db.String,nullable=False)
@@ -95,6 +100,7 @@ class Item(db.Model):
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
+    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     cart_items=db.relationship('CartItem', backref='item')
 
 
@@ -113,14 +119,23 @@ class CartItem(db.Model):
 
 
 
-@app.route('/',methods=['GET'])
+@app.route('/',methods=['GET', 'POST'])
 def index():
     users=User.query.all()
-    items=Item.query.all()
+    purchase_form = PurchaseItemForm()
+    if request.method == "POST":
+        purchased_item = request.form.get('purchased_item')
+        p_item_object = Item.query.filter_by(name=purchased_item).first()
+        if p_item_object:
+            p_item_object.id = current_user.id
+            current_user.quantity -= p_item_object.quantity
+            db.session.commit()
+    items=Item.query.filter_by(user_id=None)
+    print(request.form.get('purchased_item'))
     images=[]
     for item in items:
         images.append(url_for('static',filename='item_images/+item.image'))
-    return render_template('index.html',users=users,items=items,images=images)
+    return render_template('index.html',users=users,items=items,images=images, purchase_form=purchase_form)
 
 @app.route('/test',methods=['GET'])
 def testroute():
@@ -419,6 +434,7 @@ def Dicts(dict1, dict2):
 def AddCart():
     try:
         item_id = request.form.get('id')
+        name = request.form.get('name')
         quantity = request.form.get('quantity')
         item = Item.query.filter_by(id=item_id).first()
         if item_id and quantity and request.method == "POST":
@@ -441,11 +457,9 @@ def AddCart():
         return redirect(request.referrer)
 
 @app.route('/cart',methods=['GET'])
-def car():
-    #items=Item.query.all()
-    if 'Shoppingcart' not in session:
-        return redirect(request.referrer)
-    #items=Item.query.all()
+def cart():
+    items=Item.query.all()
+    
     return render_template('cart.html',items=items)
 
 
