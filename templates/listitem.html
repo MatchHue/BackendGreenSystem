@@ -3,21 +3,6 @@
 
 
 {% block content %}
-
-<div class="container">
-  <div class="col-md-2"></div>
-  <div class="col-md-8">
-    <h2 class="text-center bg-info p-2">Add a product</h2>
-    <form action="" method="POST" enctype="multipart/form-data">
-      {{ render_field(form.name, class="form-control", placeholder="Add product name")}}
-      {{ render_field(form.quantity, class="form-control", placeholder="Quantity in KG")}}
-    </form>
-  </div>
-</div>
-
-
-
-<!--
   <br/>
   <br/>
   <br/>
@@ -48,13 +33,4 @@
       </form>
       </div>
 
-    {% for product in products %}
-      <div class="product-item">
-        <h3>{{ product.name }}</h3>
-        <img src="static/item_images/{{ lettuce.jpg }}" alt="" width="200px" height="200px">
-
-      </div>
-
-    {% endfor %}
-    -->
 {% endblock content %}

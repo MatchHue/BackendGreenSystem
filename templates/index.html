@@ -53,23 +53,8 @@
                             <small class="text-right" style="margin-left:1m;">{{item.quantity}} KG Available</small></div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center pt-1">
-                        <form method="POST">
-                            {{ purchase_form.hidden_tag() }}
-                            <label for="">Quantity</label>
-                            <input type="number" name="quantity" id="" min="0" max="{{item.quantity}}">
-                            <input id="purchased_item" name="purchased_item" type="hidden" value="{{item.quantity}}">
-                            {{ purchase_form.submit(class="btn btn-outline-success btn-block") }}
-                        </form>
-                        <!--
-                        <form action="{{url_for('AddCart')}}" method="POST">
-                            <input type="hidden" name="item_id" value="{{item.id}}">
-                            <button type="submit" style="margin-left:5.7em;" class="btn btn-primary btn-sm">Add to Cart</button>
-                            <label for="">Quantity</label>
-                            <input type="number" name="quantity" id="" min="0" max="{{item.quantity}}">
-                        </form>
-
-
-                        <form action="{{url_for('AddCart')}}" method="POST">
+                        
+                        <form action="" method="POST">
                             <div class="form">
                               <div class="col">
                                   <label style="margin-left:7.1em;">Quantity</label>
@@ -81,7 +66,7 @@
                                         class="btn btn-primary btn-sm" href="{{url_for('AddCart')}}">Add to Cart</button>
                             </div>
                           </form>
-                        -->
+                        
                     </div>
                 </div>
             </div>
@@ -89,16 +74,6 @@
      {%endfor%}
     </div>
 </div>
-<!--
-{% for item in items %}
-      <div class="product-item">
-        <h3>{{ item.name }}</h3>
-        <img src="static/item_images/{{ item.image }}" alt="" width="200px" height="200px">
-        <p>{{ item.price}}</p>
-        <button onclick="addToCart(item.id)" type="button" class="btn btn-primary">Add to Cart</button>
-      </div>
 
-{% endfor %}
--->
 
 {% endblock %}

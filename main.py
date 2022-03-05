@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,redirect,jsonify, flash, session
+from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -50,10 +50,10 @@ class ItemForm(FlaskForm):
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
 
-class PurchaseItemForm(FlaskForm):
+#class PurchaseItemForm(FlaskForm):
     submit = SubmitField(label='Purchase Item!')
 
-class SellItemForm(FlaskForm):
+#class SellItemForm(FlaskForm):
     submit = SubmitField(label='Sell Item!')
     
 
@@ -68,7 +68,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String,nullable=False)
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
-    items=db.relationship('Item',backref='user')
+    #items=db.relationship('Item',backref='user')
 
 
     def toDict(self):
@@ -100,8 +100,8 @@ class Item(db.Model):
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
-    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
-    cart_items=db.relationship('CartItem', backref='item')
+    #user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
+    #cart_items=db.relationship('CartItem', backref='item')
 
 
     def toDict(self):
@@ -122,20 +122,11 @@ class CartItem(db.Model):
 @app.route('/',methods=['GET', 'POST'])
 def index():
     users=User.query.all()
-    purchase_form = PurchaseItemForm()
-    if request.method == "POST":
-        purchased_item = request.form.get('purchased_item')
-        p_item_object = Item.query.filter_by(name=purchased_item).first()
-        if p_item_object:
-            p_item_object.id = current_user.id
-            current_user.quantity -= p_item_object.quantity
-            db.session.commit()
-    items=Item.query.filter_by(user_id=None)
-    print(request.form.get('purchased_item'))
+    items=Item.query.all()
     images=[]
     for item in items:
         images.append(url_for('static',filename='item_images/+item.image'))
-    return render_template('index.html',users=users,items=items,images=images, purchase_form=purchase_form)
+    return render_template('index.html',users=users,items=items,images=images)
 
 @app.route('/test',methods=['GET'])
 def testroute():
@@ -237,28 +228,16 @@ def saveimage(picture_file):
 @app.route('/list_items',methods=['GET','POST'])
 @login_required
 def list_items():
-    form = ItemForm(request.form)
-    if request.method == "POST":
-        name = form.name.data
-        price = form.price.data
-        quantity = form.quantity.data
-        image = image_file
-        newItem = ItemForm(name=name, price=price, quantity=quantity, image=image)
+    form=ItemForm()
+    if form.validate_on_submit():
+        image_file=saveimage(form.image.data)
+        print(image_file)
+        newItem=Item(name=form.name.data, image=image_file, quantity=form.quantity.data, price=form.price.data, delivery=form.delivery.data)
         db.session.add(newItem)
-        flash(f'The product {name} has been added', 'success')
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('listitem.html', title="List Item Page", form=form)
-    #form=ItemForm()
-    #if form.validate_on_submit():
-        #image_file=saveimage(form.image.data)
-        #print(image_file)
-        #newItem=Item(name=form.name.data, image=image_file, quantity=form.quantity.data, price=form.price.data, delivery=form.delivery.data)
-        #db.session.add(newItem)
-        #db.session.commit()
-        #return redirect(url_for('index'))
 
-    #return render_template('listitem.html',form=form)
+    return render_template('listitem.html',form=form)
 
 
 @app.route('/rate_user',methods=['POST'])
@@ -423,13 +402,6 @@ def get_item_detail():
 
 
 
-def Dicts(dict1, dict2):
-    if isinstance(dict1, list) and isinstance(dict2, list):
-        return dict1 + dict2
-    elif isinstance(dict1, dict) and isinstance(dict2, dict):
-        return dict(list(dict1.items()) + list(dict2.items()))
-    return False
-
 @app.route('/add_to_cart', methods=['POST'])
 def AddCart():
     try:
@@ -442,15 +414,8 @@ def AddCart():
                                 'price': item.price, 
                                 'quantity': item.quantity, 
                                 'image': item.image}}
-            if 'Shoppingcart' in session:
-                if item_id in session['Shoppingcart']:
-                    print("This product is already in your cart")
-                else:
-                    session['Shoppingcart'] = Dicts(session['Shoppingcart'], DictItems)
-                    return redirect(request.referrer)
-            else: 
-                session['Shoppingcart'] = DictItems
-                return redirect(request.referrer)      
+        session['Shoppingcart'] = DictItems
+        return redirect(request.referrer)    
     except Exception as e:
         print(e)
     finally:
@@ -459,6 +424,7 @@ def AddCart():
 @app.route('/cart',methods=['GET'])
 def cart():
     items=Item.query.all()
+
     
     return render_template('cart.html',items=items)
 
