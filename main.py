@@ -396,13 +396,11 @@ def get_item_detail():
 @login_required
 def add_to_cart(id):
     item=Item.query.get(id)
-    form=request.data()
-    cartItem=Cart(item=item,quantity=form['quantity'])
+    data=request.form
+    cartItem=Cart(item=item,quantity=data['quantity'])
     db.session.add(cartItem)
     db.session.commit()
-
-    cart=Cart.query.all()
-    return render_template('index.html',cart=cart)
+    return render_template('index.html')
 
 @app.route('/checkout',methods=['POST'])
 #@login_required
