@@ -71,6 +71,7 @@ class User(db.Model,UserMixin):
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
+    cart=db.relationshup('Cart',backref='user',uselist=False)
 
 
     def toDict(self):
@@ -101,7 +102,7 @@ class Item(db.Model):
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
-    #cart_items=db.relationship('Item',backref='item')
+    cart_items=db.relationship('Cart',backref='item')
 
 
     def toDict(self):
@@ -113,6 +114,11 @@ class Item(db.Model):
             'price':self.price
         }
 
+class Cart(db.Model):
+    cart_id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
+    cart_items=db.Column(db.Integer,db.ForeignKey('item.id'))    
+    quantity=db.Column(db.Integer,nullable=False)
 
 
 def getlocation():
