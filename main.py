@@ -392,6 +392,19 @@ def get_item_detail():
     }
     return item_details
 
+@app.route('/cart', methods=['POST', 'GET'])
+def cart():
+    cart={
+        "name":"Pumpkins",
+        "price":"$35",
+        "image":"a-bunch-of-pumpkins-in-a-box.jpg",
+        "quantity":2
+        }
+    #return cart,200
+    #cartItem=Cart.query.all()
+    return render_template('cart.html', cart=cart)
+
+    
 @app.route('/add_to_cart/<int:id>',methods=['POST'])
 @login_required
 def add_to_cart(id):

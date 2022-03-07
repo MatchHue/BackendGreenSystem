@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+{{super()}}
+
+
+
+<div class="col-8">
+    <table class="table table-hover table dark">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td>{{cart.id}}</td>
+              <td>{{ cart.name }}</td>
+              <td>{{ cart.quantity }}</td>
+              <td>{{ cart.price }}</td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+<!--
+<div class="col-8">
+  <table class="table table-hover table dark">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Price</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for cartitem in cartitems %}
+        <tr>
+            <td>{{cartitem.name}}</td>
+            <td>{{cartitem.quantity}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+-->
+
+<!--
+{% for item in items %}
+<div class="product-item">
+  <h3>{{ item.name }}</h3>
+  <img src="static/item_images/{{ item.image }}" alt="" width="200px" height="200px">
+  <p>{{ item.price}}</p>
+  <button onclick="addToCart(item.id)" type="button" class="btn btn-primary">Add to Cart</button>
+</div>
+
+{% endfor %}
+-->
+
+
+
+
+{% endblock %}
