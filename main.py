@@ -71,7 +71,7 @@ class User(db.Model,UserMixin):
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
-    cart=db.relationshup('Cart',backref='user',uselist=False)
+    cart=db.relationship('Cart',backref='user',uselist=False)
 
 
     def toDict(self):
