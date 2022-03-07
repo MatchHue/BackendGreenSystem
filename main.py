@@ -402,6 +402,11 @@ def add_to_cart(id):
     db.session.commit()
     return render_template('index.html')
 
+@app.route('/get_cart',methods=['GET'])
+def get_cart():
+    carts=Cart.query.all()
+    return render_template('cart.html',carts=carts)
+
 @app.route('/checkout',methods=['POST'])
 #@login_required
 def checkout():

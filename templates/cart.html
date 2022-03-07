@@ -1,0 +1,19 @@
+{%extends "layout.html"%}
+
+
+
+
+
+{{ super() }}
+
+{% block content %}
+
+
+{%for item in carts%}
+
+
+<p>{{item.quantity}}</p>
+
+{%endfor%}
+
+{%endblock%}
