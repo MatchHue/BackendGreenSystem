@@ -56,7 +56,7 @@
                 <form class="form-inline">
                     <div class="form-group mx-sm-3 mb-2">
                       <label for="inputPassword2" class="sr-only">Quantity</label>
-                      <input type="number" style="width: 300px;" min="1" max="{{item.quantity}}" class="form-control" id="quantity" placeholder="Quantity">
+                      <input type="number" style="width: 300px;" min="1" max="{{item.quantity}}" class="form-control" id="quantity" name="quantity" placeholder="Quantity">
                     </div>
                     <div style="margin-left: 20%;">
                     <button type="submit"  action="/addToCart/{{item.id}}" class="btn btn-primary mb-2">Add to Cart</button>
