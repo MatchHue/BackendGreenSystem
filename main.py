@@ -392,18 +392,17 @@ def get_item_detail():
     }
     return item_details
 
-@app.route('/add_to_cart',methods=['POST'])
-#@login_required
-def add_to_cart():
-    cart={
-    "item_id": 1,
-    "name": "mango",
-    "price": "$3 per",
-    "image": "mango.png",
-    "quantity": 5
-    }
+@app.route('/add_to_cart/<int:id>',methods=['POST'])
+@login_required
+def add_to_cart(id):
+    item=Item.query.get(id)
+    form=request.data()
+    cartItem=Cart(item=item,quantity=form['quantity'])
+    db.session.add(cartItem)
+    db.session.commit()
 
-    return jsonify(message='Item added'),cart
+    cart=Cart.query.all()
+    return render_template('index.html',cart=cart)
 
 @app.route('/checkout',methods=['POST'])
 #@login_required
