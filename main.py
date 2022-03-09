@@ -71,7 +71,7 @@ class User(db.Model,UserMixin):
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
-    cart=db.relationship('Cart',backref='user',uselist=False)
+    cart=db.relationship('Cart',backref='user')
 
 
     def toDict(self):
@@ -118,7 +118,7 @@ class Cart(db.Model):
     cart_id=db.Column(db.Integer,primary_key=True)
     user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
     item_id=db.Column(db.Integer,nullable=False)  
-    quantity=db.Column(db.Integer,nullable=False)
+    cart_quantity=db.Column(db.Integer,nullable=False)
 
 
 def getlocation():
@@ -398,15 +398,22 @@ def add_to_cart(id):
     item_id=id
     user=current_user.id
     data=request.form
-    cartItem=Cart(item_id=item_id,quantity=data['quantity'],user_id=user)
+    cartItem=Cart(item_id=item_id,cart_quantity=data['quantity'],user_id=user)
     db.session.add(cartItem)
     db.session.commit()
-    return render_template('index.html')
+    return redirect(url_for('index'))
 
 @app.route('/get_cart',methods=['GET'])
 def get_cart():
+    user=User.query.get(current_user.id)
+    items=[]
     carts=Cart.query.all()
-    return render_template('cart.html',carts=carts)
+    for c in user.cart:
+        item=Item.query.get(c.item_id)
+        cart=Cart.query.get(c.cart_id)
+        items.append(item)
+        items.append(cart)
+    return render_template('cart.html',items=items,user=user,carts=carts)
 
 @app.route('/checkout',methods=['POST'])
 #@login_required

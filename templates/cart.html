@@ -9,11 +9,12 @@
 {% block content %}
 
 
-{%for item in carts%}
+{%for item in items%}
 
 
-<p>{{item.quantity}}</p>
-
+<p>{{item.name}}</p>
+<p>{{item.price}}</p>
+<p>{{item.cart_quantity}}</p>
 {%endfor%}
 
 {%endblock%}
