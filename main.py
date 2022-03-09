@@ -190,6 +190,7 @@ def get_all_users():
 
     users=User.query.all()
     return users
+    return render_template('sellers.html',users=users)
 
 
 @app.route('/get_user_items/<int:id>',methods=['GET'])
@@ -242,23 +243,6 @@ def get_rating():
     "rating":3
     }
     return user_rating
-
-
-
-
-
-@app.route('/get_all_sellers',methods=['GET'])
-@login_required
-def get_all_users():
-
-    users=User.query.all()
-    return users
-    return render_template('sellers.html',user=user)
-
-
-
-
-
 
 
 @app.route('/get_all_items',methods=['GET'])
