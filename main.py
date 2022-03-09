@@ -102,7 +102,7 @@ class Item(db.Model):
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
-    cart_items=db.relationship('Cart',backref='item')
+    #cart_items=db.relationship('Cart',backref='item')
 
 
     def toDict(self):
@@ -117,7 +117,7 @@ class Item(db.Model):
 class Cart(db.Model):
     cart_id=db.Column(db.Integer,primary_key=True)
     user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
-    cart_items=db.Column(db.Integer,db.ForeignKey('item.id'))    
+    item_id=db.Column(db.Integer,nullable=False)  
     quantity=db.Column(db.Integer,nullable=False)
 
 
@@ -395,9 +395,10 @@ def get_item_detail():
 @app.route('/add_to_cart/<int:id>',methods=['POST'])
 @login_required
 def add_to_cart(id):
-    item=Item.query.get(id)
+    item_id=id
+    user=current_user.id
     data=request.form
-    cartItem=Cart(item=item,quantity=data['quantity'])
+    cartItem=Cart(item_id=item_id,quantity=data['quantity'],user_id=user)
     db.session.add(cartItem)
     db.session.commit()
     return render_template('index.html')
