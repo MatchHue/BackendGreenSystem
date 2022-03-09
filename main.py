@@ -247,7 +247,7 @@ def get_rating():
 
 
 @app.route('/get_all_sellers',methods=['GET'])
-def get_all_users():
+def get_all_sellers():
 
     sellers=User.query.all()
     return render_template('sellers.html',sellers=sellers)
