@@ -194,7 +194,7 @@ def get_all_users():
 
 @app.route('/get_user_items/<int:id>',methods=['GET'])
 def get_user_items(id):
-    user=User.query.filter(id==id).first()
+    user=User.query.get(id)
     items=user.items
     return render_template('user_items.html',user=user,items=items)
 
@@ -477,6 +477,18 @@ def map():
         ).add_to(map)
     
     return map._repr_html_()
+
+
+@app.route('/user_location/<int:id>',methods=['GET'])
+def user_location(id):
+    user=User.query.get(id)
+    map=folium.Map(location=[user.latitude,user.longtitude],tiles='Stamen Terrain',zoom_start=10)
+    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location ").add_to(map)
+    return map._repr_html_()
+
+
+
+
 
 if __name__=="__main__":
     app.run(debug=True)
