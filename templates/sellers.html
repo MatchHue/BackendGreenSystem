@@ -3,28 +3,23 @@
 
 {% block content%}
 
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-    <div class="shadow p-3 mb-5 bg-white rounded">
-      <form method="POST" enctype="multipart/form-data">
-          {{form.hidden_tag()}}
+<div class="shadow p-3 mb-5 bg-white rounded">
+     <form method="POST" enctype="multipart/form-data">
+        {{form.hidden_tag()}}
           
-          {{form.image(class="form-control")}}
-          <br/>
-          {{form.name(class="form-control",placeholder="Item Name")}}
-
-          <br/>
-          <p>Item Information</p>
-          <div class="row g-3">
-              <div class="col">
-                  {{form.quantity(class="form-control",  placeholder="Quantity in KG")}}
-              </div>
-              <div class="col">
-                  {{form.price(class="form-control",placeholder="Price per KG")}}
-              </div>
+        {{form.image(class="form-control")}}
+        <br/>
+        {{form.name(class="form-control",placeholder="Item Name")}}
+         <br/>
+         <p>Item Information</p>
+         <div class="row g-3">
+            <div class="col">
+             {{form.quantity(class="form-control",  placeholder="Quantity in KG")}}
             </div>
+            <div class="col">
+                {{form.price(class="form-control",placeholder="Price per KG")}}
+            </div>
+          </div>
 
           <br/>
             {{form.delivery(class="form-control")}}

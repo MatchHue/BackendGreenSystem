@@ -245,6 +245,16 @@ def get_rating():
     return user_rating
 
 
+
+@app.route('/get_all_sellers',methods=['GET'])
+def get_all_users():
+
+    sellers=User.query.all()
+    return render_template('sellers.html',sellers=sellers)
+
+
+
+
 @app.route('/get_all_items',methods=['GET'])
 def get_all_items():
     all_items={"items":[
