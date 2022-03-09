@@ -247,7 +247,7 @@ def get_rating():
 
 
 
-@app.route('/get_all_users',methods=['GET'])
+@app.route('/get_all_sellers',methods=['GET'])
 @login_required
 def get_all_users():
 
