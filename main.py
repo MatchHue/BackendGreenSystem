@@ -243,6 +243,24 @@ def get_rating():
     }
     return user_rating
 
+
+
+
+
+@app.route('/get_all_users',methods=['GET'])
+@login_required
+def get_all_users():
+
+    users=User.query.all()
+    return users
+    return render_template('sellers.html',user=user)
+
+
+
+
+
+
+
 @app.route('/get_all_items',methods=['GET'])
 def get_all_items():
     all_items={"items":[
