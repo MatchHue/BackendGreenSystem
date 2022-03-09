@@ -71,6 +71,7 @@ class User(db.Model,UserMixin):
     longtitude=db.Column(db.Numeric,nullable=False)
     latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
+    cart=db.relationship('Cart',backref='user')
 
 
     def toDict(self):
@@ -101,7 +102,7 @@ class Item(db.Model):
     quantity=db.Column(db.Integer,nullable=False)
     price=db.Column(db.Float,nullable=False)
     delivery=db.Column(db.String,nullable=False)
-    #cart_items=db.relationship('Item',backref='item')
+    #cart_items=db.relationship('Cart',backref='item')
 
 
     def toDict(self):
@@ -113,6 +114,11 @@ class Item(db.Model):
             'price':self.price
         }
 
+class Cart(db.Model):
+    cart_id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
+    item_id=db.Column(db.Integer,nullable=False)  
+    cart_quantity=db.Column(db.Integer,nullable=False)
 
 
 def getlocation():
@@ -386,18 +392,28 @@ def get_item_detail():
     }
     return item_details
 
-@app.route('/add_to_cart',methods=['POST'])
-#@login_required
-def add_to_cart():
-    cart={
-    "item_id": 1,
-    "name": "mango",
-    "price": "$3 per",
-    "image": "mango.png",
-    "quantity": 5
-    }
+@app.route('/add_to_cart/<int:id>',methods=['POST'])
+@login_required
+def add_to_cart(id):
+    item_id=id
+    user=current_user.id
+    data=request.form
+    cartItem=Cart(item_id=item_id,cart_quantity=data['quantity'],user_id=user)
+    db.session.add(cartItem)
+    db.session.commit()
+    return redirect(url_for('index'))
 
-    return jsonify(message='Item added'),cart
+@app.route('/get_cart',methods=['GET'])
+def get_cart():
+    user=User.query.get(current_user.id)
+    items=[]
+    carts=Cart.query.all()
+    for c in user.cart:
+        item=Item.query.get(c.item_id)
+        cart=Cart.query.get(c.cart_id)
+        items.append(item)
+        items.append(cart)
+    return render_template('cart.html',items=items,user=user,carts=carts)
 
 @app.route('/checkout',methods=['POST'])
 #@login_required
