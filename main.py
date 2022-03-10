@@ -411,6 +411,7 @@ def add_to_cart(id):
     return redirect(url_for('index'))
 
 @app.route('/get_cart',methods=['GET'])
+@login_required
 def get_cart():
     user=User.query.get(current_user.id)
     items=[]
