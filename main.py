@@ -417,6 +417,9 @@ def add_to_cart(id):
     db.session.commit()
     return redirect(url_for('index'))
 
+
+
+
 @app.route('/get_cart',methods=['GET'])
 def get_cart():
     user=User.query.get(current_user.id)
