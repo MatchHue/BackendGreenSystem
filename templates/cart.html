@@ -1,0 +1,43 @@
+{%extends "layout.html"%}
+
+
+
+
+
+{{ super() }}
+
+{% block content %}
+<h2>{{user.username}}'s Cart</h2>
+<div class="col-8">
+    <table class="table table-hover table dark">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+            {%for item in items%}
+          <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.cart_quantity }}</td>
+              <td>{{ item.price }}</td>
+          </tr>
+          {%endfor%}
+      </tbody>
+    </table>
+    <input type="submit" value="Proceed to Checkout" class="btn">
+  </div>
+
+<!--
+<p>{{user.username}}'s Cart</p>
+{%for item in items%}
+
+
+<p>{{item.name}}</p>
+<p>{{item.price}}</p>
+<p>{{item.cart_quantity}}</p>
+{%endfor%}
+-->
+{%endblock%}
