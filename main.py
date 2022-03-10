@@ -13,6 +13,7 @@ from flask_login import UserMixin, login_user, login_manager, login_required, lo
 import os
 import requests
 import folium
+import string,random
 
 
 app=Flask(__name__)
@@ -120,6 +121,12 @@ class Cart(db.Model):
     item_id=db.Column(db.Integer,nullable=False)  
     cart_quantity=db.Column(db.Integer,nullable=False)
 
+class Order(db.Model):
+    order_id=db.Column(db.Integer,primary_key=True)
+    seller_id=db.Column(db.Integer,nullable=False)
+    buyer_id=db.Column(db.Integer,nullable=False)
+    item_bought=db.Column(db.Integer,nullable=False)
+    order_code=db.Column(db.String,nullable=False)
 
 def getlocation():
     response=requests.get("http://ip-api.com/json/")
@@ -421,6 +428,20 @@ def get_cart():
         items.append(item)
         items.append(cart)
     return render_template('cart.html',items=items,user=user,carts=carts)
+
+
+def     generate_order_code():
+    letters = string.ascii_lowercase
+    code=''.join(random.choice(letters) for i in range(5))
+    return code
+
+@app.route("/test_code",methods=['GET'])
+def test_code():    
+    code=generate_order_code()
+    return code
+
+
+
 
 @app.route('/checkout',methods=['POST'])
 #@login_required
