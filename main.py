@@ -198,6 +198,13 @@ def get_all_users():
     return users
 
 
+@app.route('/get_all_sellers',methods=['GET'])
+def get_all_sellers():
+
+    sellers=User.query.all()
+    return render_template('sellers.html',sellers=sellers)
+
+
 @app.route('/get_user_items/<int:id>',methods=['GET'])
 def get_user_items(id):
     user=User.query.get(id)
