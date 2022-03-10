@@ -453,7 +453,7 @@ def code_clash():
     code=generate_order_code()
     codes = set()
     while 1:
-        
+        break
 
     return len(codes)
 
