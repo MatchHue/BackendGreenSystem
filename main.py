@@ -126,6 +126,7 @@ class Order(db.Model):
     seller_id=db.Column(db.Integer,nullable=False)
     buyer_id=db.Column(db.Integer,nullable=False)
     item_bought=db.Column(db.Integer,nullable=False)
+    quantity_bought=db.Column(db.Integer,nullable=False)
     order_code=db.Column(db.String,nullable=False)
 
 def getlocation():
@@ -448,30 +449,23 @@ def test_code():
     return code
 
 
-@app.route("/code_clash",methods=['GET'])
-def code_clash():
-    code=generate_order_code()
-    codes = set()
-    while 1:
-        break
-
-    return len(codes)
 
 
 
 
-@app.route('/checkout',methods=['POST'])
+@app.route('/checkout/<int:id>',methods=['POST'])
 #@login_required
-def checkout():
-    cart={
-        item:{
-        "name":"mango",
-        "price":"$3 per",
-        "image":"mango.png",
-        "quantity":15
-        }
-        }
-    return cart,200
+def checkout(id):
+    user=User.query.get(id)
+    for c in user.cart:
+        item=Item.query.get(c.item_id)
+        cart=Cart.query.get(c.cart_id)
+        code=generate_order_code
+        newOrder=Order(seller_id=item.user_id,buyer_id=id,item_bought=c.item_id,quantity_bought=cart.quantity,
+        order_code=code)
+        db.session.add(newOrder)
+    db.session.commit()
+    return render_template('index.html')
 
 @app.route('/paynow',methods=['POST'])
 #@login_required
@@ -546,7 +540,6 @@ def user_location(id):
     map=folium.Map(location=[user.latitude,user.longtitude],tiles='Stamen Terrain',zoom_start=10)
     folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location ").add_to(map)
     return map._repr_html_()
-
 
 
 
