@@ -450,7 +450,11 @@ def test_code():
 
 
 
-
+def update_item_quantity(item_id,quantity):
+    item=Item.Query.get(id)
+    item.quantity=item.quantity-quantity
+    db.commit()
+    return 
 
 
 @app.route('/checkout/<int:id>',methods=['POST'])
@@ -461,8 +465,9 @@ def checkout(id):
         item=Item.query.get(c.item_id)
         cart=Cart.query.get(c.cart_id)
         code=generate_order_code
-        newOrder=Order(seller_id=item.user_id,buyer_id=id,item_bought=c.item_id,quantity_bought=cart.quantity,
+        newOrder=Order(seller_id=item.user_id,buyer_id=id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
         order_code=code)
+        update_item_quantity(c.item_id,cart.cart_quantity)
         db.session.add(newOrder)
     db.session.commit()
     return render_template('index.html')
