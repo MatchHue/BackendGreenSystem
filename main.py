@@ -434,7 +434,7 @@ def get_cart():
     return render_template('cart.html',items=items,user=user,carts=carts)
 
 
-def     generate_order_code():
+def  generate_order_code():
     letters = string.ascii_lowercase
     digits=string.digits
     code=''.join(random.choice(letters) for i in range(5))
@@ -451,26 +451,36 @@ def test_code():
 
 
 def update_item_quantity(item_id,quantity):
-    item=Item.Query.get(id)
+    item=Item.query.get(item_id)
     item.quantity=item.quantity-quantity
-    db.commit()
+    db.session.commit()
     return 
 
+def delete_cart(cart_id):
+    cart=Cart.query.get(cart_id)
+    db.session.delete(cart)
+    db.session.commit()
+    return
 
-@app.route('/checkout/<int:id>',methods=['POST'])
+@app.route('/get_orders',methods=['GET'])
+def get_orders():
+    return 
+
+@app.route("/checkout/<int:id>",methods=['GET'])
 #@login_required
 def checkout(id):
     user=User.query.get(id)
     for c in user.cart:
         item=Item.query.get(c.item_id)
         cart=Cart.query.get(c.cart_id)
-        code=generate_order_code
+        code=generate_order_code()
         newOrder=Order(seller_id=item.user_id,buyer_id=id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
         order_code=code)
         update_item_quantity(c.item_id,cart.cart_quantity)
+        delete_cart(c.cart_id)
         db.session.add(newOrder)
     db.session.commit()
-    return render_template('index.html')
+    return redirect(url_for('index'))
 
 @app.route('/paynow',methods=['POST'])
 #@login_required

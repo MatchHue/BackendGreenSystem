@@ -27,7 +27,7 @@
           {%endfor%}
       </tbody>
     </table>
-    <input type="submit" action="/checkout/{{item.user_id}}" methods="POST" value="Proceed to Checkout" class="btn">
+    <a href="/checkout/{{user.id}}" class="btn btn-primary btn-sm active">Checkout</a>
   </div>
 
 <!--
