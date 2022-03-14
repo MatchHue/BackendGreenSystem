@@ -464,17 +464,20 @@ def delete_cart(cart_id):
 
 @app.route('/get_orders',methods=['GET'])
 def get_orders():
-    return 
+    sellers_orders=Order.query.filter_by(seller_id=current_user.id).first()
+    buyers_orders=Order.query.filter_by(buyer_id=current_user.id).first()
+
+    return render_template('orders_list.html',sellers_orders=sellers_orders,buyers_orders=buyers_orders)
 
 @app.route("/checkout/<int:id>",methods=['GET'])
-#@login_required
+@login_required
 def checkout(id):
     user=User.query.get(id)
     for c in user.cart:
         item=Item.query.get(c.item_id)
         cart=Cart.query.get(c.cart_id)
         code=generate_order_code()
-        newOrder=Order(seller_id=item.user_id,buyer_id=id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
+        newOrder=Order(seller_id=item.user_id,buyer_id=user.id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
         order_code=code)
         update_item_quantity(c.item_id,cart.cart_quantity)
         delete_cart(c.cart_id)

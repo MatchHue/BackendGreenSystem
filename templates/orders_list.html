@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block title %}GreenSystems Backend{% endblock %}
+{% block page %}GreenSystems MVC{% endblock %}
+
+{{ super() }}
+
+{% block content %}
+
+
+<!--------products-------->
+<!--<div class="small-container">
+    {% for item in items%}
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="/static/item_images/{{item.image}}" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title">{{item.name}}</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+      </div>
+      {%endfor%}
+</div>-->
+
+<div class='container'>
+    <div class="row">
+    {% for order in buyer_orders%}
+    <p>order.order_code</p>
+        {%if order.buyer_id==current_user.id %}
+    <div class="col">
+
+        <div class="card-body text-center mx-auto">
+            <div class='cvp'>
+                <p> {{order.order_code}}</p><p> {{order.item_bought}}</p>
+                <h5 class="card-title font-weight-bold"></h5>
+                <p class="card-text">$ per kg</p> <p class="card-text">kg Available</p><a href="" class="btn btn-primary btn-sm active">view details</a><br />
+            </div>
+        </div>
+    </div>
+</div>
+<br/>
+        {%endif%}
+    {%endfor%}
+</div>
+</div>
+
+<hr/>
+
+
+
+
+{% endblock %}
