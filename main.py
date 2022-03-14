@@ -468,8 +468,11 @@ def get_orders():
     sellers_orders=Order.query.filter_by(seller_id=current_user.id).all()
     buyers_orders=Order.query.filter_by(buyer_id=current_user.id).all()
     seller_items=[]
+    buyer=[]
     for item in sellers_orders:
         i=Item.query.get(item.item_bought)
+        user=User.query.get(item.buyer_id)
+        buyer.append(user)
         seller_items.append(i)
     buyer_items=[]
     for item in buyers_orders:
@@ -477,7 +480,8 @@ def get_orders():
         buyer_items.append(i)
     bl=len(buyer_items)
     sl=len(seller_items)
-    return render_template('orders_list.html',bl=bl,sl=sl,sellers_orders=sellers_orders,buyers_orders=buyers_orders,seller_items=seller_items,buyer_items=buyer_items)
+    return render_template('orders_list.html',buyer=buyer,bl=bl,sl=sl,
+    sellers_orders=sellers_orders,buyers_orders=buyers_orders,seller_items=seller_items,buyer_items=buyer_items)
 
 @app.route("/checkout/<int:id>",methods=['GET'])
 @login_required
@@ -487,7 +491,7 @@ def checkout(id):
         item=Item.query.get(c.item_id)
         cart=Cart.query.get(c.cart_id)
         code=generate_order_code()
-        newOrder=Order(seller_id=item.user_id,buyer_id=user.id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
+        newOrder=Order(seller_id=item.user.id,buyer_id=user.id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
         order_code=code)
         update_item_quantity(c.item_id,cart.cart_quantity)
         delete_cart(c.cart_id)
