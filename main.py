@@ -508,6 +508,37 @@ def buyer_order(id):
     seller=User.query.get(order.seller_id)
     return render_template('buyer_order.html',order=order,item=item,seller=seller)
 
+@app.route("/seller_order/<int:id>",methods=['GET'])
+@login_required
+def seller_order(id):
+    order=Order.query.get(id)
+    item=Item.query.get(order.item_bought)
+    buyer=User.query.get(order.buyer_id)
+    return render_template('seller_order.html',order=order,item=item,buyer=buyer)
+
+def getcode(id):
+    order=Order.query.get(id)
+    return order.order_code
+
+def deleteorder(id):
+    order=Order.query.get(id)
+    db.session.delete(order)
+    db.session.commit()
+    return
+
+
+@app.route("/confirm_order/<int:id>",methods=['POST'])
+def confirm_order(id):
+    data=request.form
+    submitted_code=data['ordercode']
+    code=getcode(id)
+    if submitted_code==code:
+        deleteorder(id)
+        return ("<h1>Order Confirmed<h1>")
+    else:
+        flash("Incorrect Code")
+        return redirect(url_for('get_orders'))
+
 @app.route('/paynow',methods=['POST'])
 #@login_required
 def paynow():
@@ -555,10 +586,6 @@ def order_list():
     }
     return order_list
 
-@app.route('/confirm_order',methods=['POST'])
-#@login_required
-def confirm_order():
-    return jsonify(message='Order Confirmed')
 
 
 

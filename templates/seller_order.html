@@ -19,10 +19,14 @@
         <p style="text-align: center;">Order Quantity : {{order.quantity_bought}} kg</p>
         <p style="text-align: center;">Order Price : ${{item.price * order.quantity_bought}}</p>
         <p style="text-align: center;">Buyer: {{buyer.username}}</p>
-        <form class="d-flex" action="/confirm_order" methods="POST">
-            <input class="form-control me-2" type="Code" placeholder="Enter Order Code From Seller" aria-label="Order Code">
-            <button class="btn btn-outline-success" type="submit">Confirm Order</button>
-          </form>
+        <form class="form-inline" action="/confirm_order/{{order.order_id}}" method="POST">
+            <div class="form-group mx-sm-3 mb-2">
+              <input type="text" style="width: 100%;" class="form-control" name="ordercode" placeholder="Enter Order Code">
+            </div>
+            <div style="margin-left: 20%;">
+            <button type="submit" class="btn btn-primary mb-2">Confirm Order</button>
+            </div>
+        </form>
     </div>
     <div>
         <a style="margin-left: 35%;" href="/user_location/{{item.user.id}}" class="btn btn-primary btn-sm active">View Location</a>
