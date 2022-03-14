@@ -4,6 +4,8 @@
 
 {{ super() }}
 
+
+
 {% block content %}
 
 
@@ -20,6 +22,20 @@
       </div>
       {%endfor%}
 </div>-->
+
+{% for message in get_flashed_messages() %}
+
+<div class="alert alert-warning alert-dismissible show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+
+    {%endfor%}
+
+
 
 <h1 style="text-align: center;">LIST OF ORDERS</h1>
 <br/>
