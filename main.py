@@ -1,3 +1,4 @@
+from ctypes import sizeof
 import json
 from unicodedata import numeric
 from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
@@ -464,10 +465,19 @@ def delete_cart(cart_id):
 
 @app.route('/get_orders',methods=['GET'])
 def get_orders():
-    sellers_orders=Order.query.filter_by(seller_id=current_user.id).first()
-    buyers_orders=Order.query.filter_by(buyer_id=current_user.id).first()
-
-    return render_template('orders_list.html',sellers_orders=sellers_orders,buyers_orders=buyers_orders)
+    sellers_orders=Order.query.filter_by(seller_id=current_user.id).all()
+    buyers_orders=Order.query.filter_by(buyer_id=current_user.id).all()
+    seller_items=[]
+    for item in sellers_orders:
+        i=Item.query.get(item.item_bought)
+        seller_items.append(i)
+    buyer_items=[]
+    for item in buyers_orders:
+        i=Item.query.get(item.item_bought)
+        buyer_items.append(i)
+    bl=len(buyer_items)
+    sl=len(seller_items)
+    return render_template('orders_list.html',bl=bl,sl=sl,sellers_orders=sellers_orders,buyers_orders=buyers_orders,seller_items=seller_items,buyer_items=buyer_items)
 
 @app.route("/checkout/<int:id>",methods=['GET'])
 @login_required
@@ -484,6 +494,15 @@ def checkout(id):
         db.session.add(newOrder)
     db.session.commit()
     return redirect(url_for('index'))
+
+
+@app.route("/buyer_order/<int:id>",methods=['GET'])
+@login_required
+def buyer_order(id):
+    order=Order.query.get(id)
+    item=Item.query.get(order.item_bought)
+    seller=User.query.get(order.seller_id)
+    return render_template('buyer_order.html',order=order,item=item,seller=seller)
 
 @app.route('/paynow',methods=['POST'])
 #@login_required
