@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+
+
+{% block content%}
+
+  <br/>
+    <div class="shadow p-3 mb-5 bg-white rounded">
+      <form method="POST" enctype="multipart/form-data">
+          {{form.hidden_tag()}}
+
+          {{form.location(class="form-control",placeholder="Address")}}
+
+          <br/>
+          <p>Payment Method: Cash On Delivery</p>
+
+          <br/>
+            {{form.delivery(class="form-control")}}
+          <br/>
+          {{form.submit}}
+      </form>
+      </div>
+
+
+{% endblock %}
