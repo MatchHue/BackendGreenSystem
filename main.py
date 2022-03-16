@@ -1,3 +1,4 @@
+from ctypes import sizeof
 import json
 from unicodedata import numeric
 from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
@@ -13,6 +14,7 @@ from flask_login import UserMixin, login_user, login_manager, login_required, lo
 import os
 import requests
 import folium
+import string,random
 
 
 app=Flask(__name__)
@@ -120,6 +122,13 @@ class Cart(db.Model):
     item_id=db.Column(db.Integer,nullable=False)  
     cart_quantity=db.Column(db.Integer,nullable=False)
 
+class Order(db.Model):
+    order_id=db.Column(db.Integer,primary_key=True)
+    seller_id=db.Column(db.Integer,nullable=False)
+    buyer_id=db.Column(db.Integer,nullable=False)
+    item_bought=db.Column(db.Integer,nullable=False)
+    quantity_bought=db.Column(db.Integer,nullable=False)
+    order_code=db.Column(db.String,nullable=False)
 
 def getlocation():
     response=requests.get("http://ip-api.com/json/")
@@ -410,6 +419,9 @@ def add_to_cart(id):
     db.session.commit()
     return redirect(url_for('index'))
 
+
+
+
 @app.route('/get_cart',methods=['GET'])
 @login_required
 def get_cart():
@@ -423,18 +435,110 @@ def get_cart():
         items.append(cart)
     return render_template('cart.html',items=items,user=user,carts=carts)
 
-@app.route('/checkout',methods=['POST'])
-#@login_required
-def checkout():
-    cart={
-        item:{
-        "name":"mango",
-        "price":"$3 per",
-        "image":"mango.png",
-        "quantity":15
-        }
-        }
-    return cart,200
+
+def  generate_order_code():
+    letters = string.ascii_lowercase
+    digits=string.digits
+    code=''.join(random.choice(letters) for i in range(5))
+    numbers=''.join(random.choice(digits) for i in range(5))
+    code=code+numbers
+    new_code=''.join(random.sample(code, len(code)))
+    return new_code
+
+@app.route("/test_code",methods=['GET'])
+def test_code():    
+    code=generate_order_code()
+    return code
+
+
+
+def update_item_quantity(item_id,quantity):
+    item=Item.query.get(item_id)
+    item.quantity=item.quantity-quantity
+    db.session.commit()
+    return 
+
+def delete_cart(cart_id):
+    cart=Cart.query.get(cart_id)
+    db.session.delete(cart)
+    db.session.commit()
+    return
+
+@app.route('/get_orders',methods=['GET'])
+def get_orders():
+    sellers_orders=Order.query.filter_by(seller_id=current_user.id).all()
+    buyers_orders=Order.query.filter_by(buyer_id=current_user.id).all()
+    seller_items=[]
+    buyer=[]
+    for item in sellers_orders:
+        i=Item.query.get(item.item_bought)
+        user=User.query.get(item.buyer_id)
+        buyer.append(user)
+        seller_items.append(i)
+    buyer_items=[]
+    for item in buyers_orders:
+        i=Item.query.get(item.item_bought)
+        buyer_items.append(i)
+    bl=len(buyer_items)
+    sl=len(seller_items)
+    return render_template('orders_list.html',buyer=buyer,bl=bl,sl=sl,
+    sellers_orders=sellers_orders,buyers_orders=buyers_orders,seller_items=seller_items,buyer_items=buyer_items)
+
+@app.route("/checkout/<int:id>",methods=['GET'])
+@login_required
+def checkout(id):
+    user=User.query.get(id)
+    for c in user.cart:
+        item=Item.query.get(c.item_id)
+        cart=Cart.query.get(c.cart_id)
+        code=generate_order_code()
+        newOrder=Order(seller_id=item.user.id,buyer_id=user.id,item_bought=c.item_id,quantity_bought=cart.cart_quantity,
+        order_code=code)
+        update_item_quantity(c.item_id,cart.cart_quantity)
+        delete_cart(c.cart_id)
+        db.session.add(newOrder)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route("/buyer_order/<int:id>",methods=['GET'])
+@login_required
+def buyer_order(id):
+    order=Order.query.get(id)
+    item=Item.query.get(order.item_bought)
+    seller=User.query.get(order.seller_id)
+    return render_template('buyer_order.html',order=order,item=item,seller=seller)
+
+@app.route("/seller_order/<int:id>",methods=['GET'])
+@login_required
+def seller_order(id):
+    order=Order.query.get(id)
+    item=Item.query.get(order.item_bought)
+    buyer=User.query.get(order.buyer_id)
+    return render_template('seller_order.html',order=order,item=item,buyer=buyer)
+
+def getcode(id):
+    order=Order.query.get(id)
+    return order.order_code
+
+def deleteorder(id):
+    order=Order.query.get(id)
+    db.session.delete(order)
+    db.session.commit()
+    return
+
+
+@app.route("/confirm_order/<int:id>",methods=['POST'])
+def confirm_order(id):
+    data=request.form
+    submitted_code=data['ordercode']
+    code=getcode(id)
+    if submitted_code==code:
+        deleteorder(id)
+        return ("<h1>Order Confirmed<h1>")
+    else:
+        flash("Incorrect Code")
+        return redirect(url_for('get_orders'))
 
 @app.route('/paynow',methods=['POST'])
 #@login_required
@@ -483,10 +587,6 @@ def order_list():
     }
     return order_list
 
-@app.route('/confirm_order',methods=['POST'])
-#@login_required
-def confirm_order():
-    return jsonify(message='Order Confirmed')
 
 
 
@@ -509,7 +609,6 @@ def user_location(id):
     map=folium.Map(location=[user.latitude,user.longtitude],tiles='Stamen Terrain',zoom_start=10)
     folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location ").add_to(map)
     return map._repr_html_()
-
 
 
 

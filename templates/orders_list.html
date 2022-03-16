@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block title %}GreenSystems Backend{% endblock %}
+{% block page %}GreenSystems MVC{% endblock %}
+
+{{ super() }}
+
+
+
+{% block content %}
+
+
+<!--------products-------->
+<!--<div class="small-container">
+    {% for item in items%}
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="/static/item_images/{{item.image}}" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title">{{item.name}}</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+      </div>
+      {%endfor%}
+</div>-->
+
+{% for message in get_flashed_messages() %}
+
+<div class="alert alert-warning alert-dismissible show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+
+    {%endfor%}
+
+
+
+<h1 style="text-align: center;">LIST OF ORDERS</h1>
+<br/>
+<div class='container'>
+    <div class="row">
+    {% for i in range(bl)%}
+    {%if buyers_orders[i].buyer_id==current_user.id %}
+    <div class="col">
+        <div class="card"> <img class='mx-auto img-thumbnail' src="/static/item_images/{{buyer_items[i].image}}" width="100%" height="100%" max-height="100px" max-midth="100px" />
+        <div class="card-body text-center mx-auto">
+            <div class='cvp'>
+                <p>Order {{buyers_orders[i].order_id}}</p>
+                <p>Bought from {{buyer_items[i].user.username}}</p>
+                <p>{{buyer_items[i].name}}</p>
+                <a href="/buyer_order/{{buyers_orders[i].order_id}}" class="btn btn-primary btn-sm active">Order details</a><br />
+            </div>
+        </div>
+    </div>
+</div>
+<br/>
+        {%endif%}
+    {%endfor%}
+</div>
+</div>
+
+<hr/>
+
+
+
+
+<br/>
+<div class='container'>
+    <div class="row">
+    {% for i in range(sl)%}
+    {%if sellers_orders[i].seller_id==current_user.id %}
+    <div class="col">
+        <div class="card"> <img class='mx-auto img-thumbnail' src="/static/item_images/{{seller_items[i].image}}" width="100%" height="100%" max-height="100px" max-midth="100px" />
+        <div class="card-body text-center mx-auto">
+            <div class='cvp'>
+                <p>Order {{sellers_orders[i].order_id}}</p>
+                <p>Bought by {{buyer[i].username}}</p>
+                <p>{{seller_items[i].name}}</p>
+                <a href="/seller_order/{{sellers_orders[i].order_id}}" class="btn btn-primary btn-sm active">Order details</a><br />
+            </div>
+        </div>
+    </div>
+</div>
+<br/>
+        {%endif%}
+    {%endfor%}
+</div>
+</div>
+
+<hr/>
+
+
+
+{% endblock %}

@@ -21,13 +21,13 @@
             {%for item in items%}
           <tr>
               <td>{{ item.name }}</td>
-              <td>{{ item.cart_quantity }}</td>
+              <td>{{ item.cart_quantity}}</td>
               <td>{{ item.price }}</td>
           </tr>
           {%endfor%}
       </tbody>
     </table>
-    <input type="submit" value="Proceed to Checkout" class="btn">
+    <a href="/checkout/{{user.id}}" class="btn btn-primary btn-sm active">Checkout</a>
   </div>
 
 <!--

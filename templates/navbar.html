@@ -20,12 +20,13 @@
             <li><a class="dropdown-item" href="/signup">Signup</a></li>
             <li><a class="dropdown-item" href="/list_items">Add Item</a></li>
             <li><a class="dropdown-item" href="/map">All Sellers Location</a></li>
+            <li><a class="dropdown-item" href="/get_orders">View Orders</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/get_all_sellers">Sellers</a></li>
           </ul>
         </li>
       </ul>
-      <form class="d-flex">
+      <form class="d-flex" action="/search" methods="GET">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
