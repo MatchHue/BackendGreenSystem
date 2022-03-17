@@ -418,6 +418,22 @@ def add_to_cart(id):
     db.session.add(cartItem)
     db.session.commit()
     return redirect(url_for('index'))
+  
+
+
+@app.route('/delivery' ,methods=['GET', 'POST'])
+@login_required
+def checkout():
+    form=AddressForm()
+    if form.validate_on_submit():
+        user=User.query.get(current_user.id)
+        address=form.address.data,user_id=current_user.id
+        delivery=form.delivery.data,user_id=current_user.id
+        db.session.add(address)
+        db.session.commit()
+        return redirect(url_for('cart'))
+    return render_template('checkout.html',address=address,user=user)
+
 
 
 
