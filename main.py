@@ -420,10 +420,9 @@ def add_to_cart(id):
     return redirect(url_for('index'))
   
 
-
 @app.route('/delivery' ,methods=['GET', 'POST'])
 @login_required
-def checkout():
+def delivery():
     form=AddressForm()
     if form.validate_on_submit():
         user=User.query.get(current_user.id)
@@ -433,7 +432,6 @@ def checkout():
         db.session.commit()
         return redirect(url_for('cart'))
     return render_template('checkout.html', form=form)
-
 
 
 
