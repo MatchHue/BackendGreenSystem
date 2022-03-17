@@ -59,7 +59,7 @@ class ItemForm(FlaskForm):
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
     
-class CheckoutForm(FlaskForm):
+class AddressForm(FlaskForm):
     address=StringField("address",validators=[DataRequired()])
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
 
@@ -76,6 +76,7 @@ class User(db.Model,UserMixin):
     latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
     cart=db.relationship('Cart',backref='user')
+    address=db.Column(db.String,unique=True,nullable=False)
 
 
     def toDict(self):
