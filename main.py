@@ -432,7 +432,7 @@ def checkout():
         db.session.add(address)
         db.session.commit()
         return redirect(url_for('cart'))
-    return render_template('checkout.html',address=address,user=user)
+    return render_template('checkout.html', form=form)
 
 
 
