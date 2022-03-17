@@ -434,8 +434,6 @@ def delivery():
     return render_template('checkout.html', form=form)
 
 
-
-
 @app.route('/get_cart',methods=['GET'])
 @login_required
 def get_cart():
