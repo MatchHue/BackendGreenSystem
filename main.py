@@ -76,7 +76,7 @@ class User(db.Model,UserMixin):
     latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
     cart=db.relationship('Cart',backref='user')
-    address=db.Column(db.String,unique=True,nullable=False)
+    address=db.Column(db.String,unique=True,nullable=True)
 
 
     def toDict(self):
