@@ -59,7 +59,9 @@ class ItemForm(FlaskForm):
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
     
-
+class CheckoutForm(FlaskForm):
+    address=StringField("address",validators=[DataRequired()])
+    delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
 
 #Models
 
