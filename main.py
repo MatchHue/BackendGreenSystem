@@ -534,7 +534,8 @@ def confirm_order(id):
     code=getcode(id)
     if submitted_code==code:
         deleteorder(id)
-        return ("<h1>Order Confirmed<h1>")
+        flash("Order Confirmed")
+        return redirect(url_for('get_orders'))
     else:
         flash("Incorrect Code")
         return redirect(url_for('get_orders'))
