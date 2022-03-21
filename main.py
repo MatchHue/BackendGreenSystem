@@ -222,7 +222,11 @@ def get_all_users():
 def get_all_sellers():
 
     sellers=User.query.all()
-    return render_template('sellers.html',sellers=sellers)
+    curr_sellers=[]
+    for s in sellers:
+        if len(s.items)>0:
+            curr_sellers.append(s)
+    return render_template('sellers.html',sellers=curr_sellers)
 
 
 @app.route('/get_user_items/<int:id>',methods=['GET'])
@@ -426,6 +430,7 @@ def add_to_cart(id):
 
 
 @app.route('/get_cart',methods=['GET'])
+@login_required
 def get_cart():
     user=User.query.get(current_user.id)
     items=[]
@@ -467,6 +472,7 @@ def delete_cart(cart_id):
     return
 
 @app.route('/get_orders',methods=['GET'])
+@login_required
 def get_orders():
     sellers_orders=Order.query.filter_by(seller_id=current_user.id).all()
     buyers_orders=Order.query.filter_by(buyer_id=current_user.id).all()
