@@ -1,4 +1,5 @@
 from ctypes import sizeof
+from gettext import lngettext
 import json
 from unicodedata import numeric
 from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
@@ -596,7 +597,18 @@ def order_list():
     }
     return order_list
 
+@app.route('/change_location',methods=['GET'])
+def change_location():
+    return render_template('map.html')
 
+@app.route('/confirm_location',methods=['POST'])
+@login_required
+def confirm_location():
+    req=request.get_json
+    lat=req.lat
+    lon=req.lng
+    flash(lat,lon)
+    return render_template('index.html')
 
 
 @app.route('/map',methods=['GET'])
