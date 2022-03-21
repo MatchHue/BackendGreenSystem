@@ -35,6 +35,13 @@ login_manager.login_view='login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+
+@app.context_processor
+def base():
+    form=SearchForm()
+    return dict(form=form)
+
 locationdata='http://ip-api.com/json/'
 
 
@@ -59,6 +66,10 @@ class ItemForm(FlaskForm):
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
     
+
+class SearchForm(FlaskForm):
+    Search=StringField("Search",validators=[DataRequired()])
+    submit=SubmitField("Search")
 
 
 #Models
@@ -318,7 +329,7 @@ def bulk_purchase():
 
 
 
-@app.route('/search',methods=['GET'])
+@app.route('/search',methods=['POST'])
 def search():
     results={
             "items": [
@@ -331,7 +342,7 @@ def search():
                 ]
 
         }
-    return results
+    return render_template('search.html')
 
 @app.route('/sort_by_price',methods=['GET'])
 def sort_by_price():
