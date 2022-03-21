@@ -329,20 +329,12 @@ def bulk_purchase():
 
 
 
-@app.route('/search',methods=['POST'])
+@app.route('/search',methods=['GET'])
 def search():
-    results={
-            "items": [
-        {
-        "name":"mango",
-        "price":"$3 per",
-        "image":"pumpkin.png",
-        "quantity":20
-        }
-                ]
-
-        }
-    return render_template('search.html')
+    data=request.args.get('searched')
+    items=Item.query
+    items=items.filter(Item.name.like('%' + data+'%'))
+    return render_template('search.html',items=items)
 
 @app.route('/sort_by_price',methods=['GET'])
 def sort_by_price():
