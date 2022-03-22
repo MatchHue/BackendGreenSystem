@@ -5,26 +5,11 @@
 <h2>Bulk Purchase</h2>
 
 <br/>
-  {%endfor%}
+  
 </div>
   <br/>
     <div class="shadow p-3 mb-5 bg-white rounded">
       <form method="POST" enctype="multipart/form-data">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Items
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% for item in items%}
-            <li>
-              <div class='cvp'>
-                <h5 class="card-title font-weight-bold">{{item.name}}</h5>
-                <p class="card-text">${{item.price}} per kg</p> <p class="card-text">{{item.quantity}}kg Available</p><a href="/item_details/{{item.id}}" class="btn btn-primary btn-sm active">view details</a><br />
-            </div>
-            </li>
-            {% endfor %}
-          </ul>
-        </li>
           <br/>
           {{form.name(class="form-control",placeholder="Item Name")}}
 
