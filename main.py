@@ -1,4 +1,5 @@
 from ctypes import sizeof
+from gettext import lngettext
 import json
 from unicodedata import numeric
 from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
@@ -35,6 +36,13 @@ login_manager.login_view='login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+
+@app.context_processor
+def base():
+    form=SearchForm()
+    return dict(form=form)
+
 locationdata='http://ip-api.com/json/'
 
 
@@ -59,6 +67,10 @@ class ItemForm(FlaskForm):
     delivery=SelectField("Delivery",choices=[("Deliver to Client"),("Have Client Pickup order")])
     submit=SubmitField("Add Item")
     
+
+class SearchForm(FlaskForm):
+    Search=StringField("Search",validators=[DataRequired()])
+    submit=SubmitField("Search")
 
 
 #Models
@@ -211,7 +223,11 @@ def get_all_users():
 def get_all_sellers():
 
     sellers=User.query.all()
-    return render_template('sellers.html',sellers=sellers)
+    curr_sellers=[]
+    for s in sellers:
+        if len(s.items)>0:
+            curr_sellers.append(s)
+    return render_template('sellers.html',sellers=curr_sellers)
 
 
 @app.route('/get_user_items/<int:id>',methods=['GET'])
@@ -320,18 +336,10 @@ def bulk_purchase():
 
 @app.route('/search',methods=['GET'])
 def search():
-    results={
-            "items": [
-        {
-        "name":"mango",
-        "price":"$3 per",
-        "image":"pumpkin.png",
-        "quantity":20
-        }
-                ]
-
-        }
-    return results
+    data=request.args.get('searched')
+    items=Item.query
+    items=items.filter(Item.name.like('%' + data+'%'))
+    return render_template('search.html',items=items)
 
 @app.route('/sort_by_price',methods=['GET'])
 def sort_by_price():
@@ -465,6 +473,7 @@ def delete_cart(cart_id):
     return
 
 @app.route('/get_orders',methods=['GET'])
+@login_required
 def get_orders():
     sellers_orders=Order.query.filter_by(seller_id=current_user.id).all()
     buyers_orders=Order.query.filter_by(buyer_id=current_user.id).all()
@@ -535,7 +544,8 @@ def confirm_order(id):
     code=getcode(id)
     if submitted_code==code:
         deleteorder(id)
-        return ("<h1>Order Confirmed<h1>")
+        flash("Order Confirmed")
+        return redirect(url_for('get_orders'))
     else:
         flash("Incorrect Code")
         return redirect(url_for('get_orders'))
@@ -587,7 +597,18 @@ def order_list():
     }
     return order_list
 
+@app.route('/change_location',methods=['GET'])
+def change_location():
+    return render_template('map.html')
 
+@app.route('/confirm_location',methods=['POST'])
+@login_required
+def confirm_location():
+    req=request.get_json
+    lat=req.lat
+    lon=req.lng
+    flash(lat,lon)
+    return render_template('index.html')
 
 
 @app.route('/map',methods=['GET'])

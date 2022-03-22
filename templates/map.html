@@ -6,7 +6,50 @@
 
 {% block content%}
 
+<style>
+    #map{
+        height: 500px;
+        width: 100%;
+    }
+</style>
+</head>
 
+<body>
+<div id="map"></div>
+
+<script>
+        function initMap(){
+
+            var options={
+                zoom:10,
+                center:new google.maps.LatLng('10.342751','-61.356453')
+            }
+            var map=new google.maps.Map(document.getElementById('map'),options);
+
+
+            map.addListener("click", (e) => {
+          placeMarkerAndPanTo(e.latLng, map);
+          console.log(e.latLng)
+ 
+        });
+
+            function placeMarkerAndPanTo(latLng, map) {
+            new google.maps.Marker({
+                position: latLng,
+                map: map,
+            });
+            map.panTo(latLng);
+            }
+
+        }
+
+
+
+</script>
+<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaZyDB6ZZDBtLvyUAS5h0CDtlpvtmdPnA&callback=initMap&v=weekly">
+</script>
 
 
 {%endblock%}
