@@ -75,8 +75,8 @@ class SearchForm(FlaskForm):
 class BulkForm(FlaskForm):
     name=StringField("Username", validators=[DataRequired()])
     quantity=IntegerField("Quantity", validators=[DataRequired()])
-    delivery=SelectField("Delivery", choices=[("Deliver to Client"),("Have Client Pickup order")])
-    submit=SubmitField("Add Item")
+    sort=SelectField("Sort", choices=[("Price"),("Location"),("Rating")])
+    submit=SubmitField("Confirm")
 
 
 #Models
@@ -319,15 +319,16 @@ def get_all_items():
 @app.route('/bulk_purchase',methods=['GET', 'POST'])
 #@login_required
 def bulk_purchase():
+    items=Item.query.all()
     form=BulkForm()
     if form.validate_on_submit():
-        newBulk=Item(name=form.name.data,quantity=form.quantity.data,delivery=form.delivery.data)
+        newBulk=Item(name=form.name.data,quantity=form.quantity.data,sort=form.sort.data)
         db.session.add(newBulk)
         db.session.commit()
         return redirect(url_for('index'))
 
     
-    return render_template('bulk_purchase.html', form=form)
+    return render_template('bulk_purchase.html', form=form, items=items)
 
 
 
