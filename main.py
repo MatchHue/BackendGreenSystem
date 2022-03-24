@@ -353,6 +353,13 @@ def get_selected_items(items,selected):
             item.append(items[i])
     return item
 
+def selected_selected(selected):
+    select=[]
+    for i in range(len(selected)):
+        if selected[i]>0:
+            select.append(selected[i])
+    return select
+
 
 @app.route("/bulk_logic",methods=["GET"])
 def bulk_logic():
@@ -374,14 +381,16 @@ def bulk_logic():
     instance["n"] = len(quantites)
     instance["ProduceQuantity"]=quantites
     instance["Prices"]=prices
-    instance["quantity"]=30
+    instance["quantity"]=25
     result = instance.solve()
 
     selected=result["SelectedProduces"]
     users=get_users_selected(usernames,selected)
     selected_items=get_selected_items(items,selected)
+    select=selected_selected(selected)
+    iterations=len(select)
     # Output the results
-    return render_template('index.html',items=selected_items)
+    return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
     #return jsonify(result["SelectedProduces"],result["price"],prices,quantites,users)
 
 
@@ -391,7 +400,7 @@ def get_items(item_name):
     return items
 
 
-@app.route('/bulk_purchase',methods=['GET', 'POST'])
+@app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
 def bulk_purchase():
     items=Item.query.all()
