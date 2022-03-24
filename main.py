@@ -413,6 +413,14 @@ def bulk_purchase():
     
     return render_template('bulk_purchase.html', form=form, items=items)
 
+@app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
+def add_bulk_to_cart(itemid,selected):
+    user=current_user.id
+    cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
+    db.session.add(cartItem)
+    db.session.commit()
+    return redirect(url_for('bulk_logic'))
+
 
 
 @app.route('/search',methods=['GET'])
@@ -516,13 +524,15 @@ def add_to_cart(id):
 def get_cart():
     user=User.query.get(current_user.id)
     items=[]
+    cartitems=[]
     carts=Cart.query.all()
     for c in user.cart:
         item=Item.query.get(c.item_id)
         cart=Cart.query.get(c.cart_id)
         items.append(item)
-        items.append(cart)
-    return render_template('cart.html',items=items,user=user,carts=carts)
+        cartitems.append(cart)
+    l=len(items)
+    return render_template('cart.html',items=items,user=user,carts=cartitems,length=l)
 
 
 def  generate_order_code():

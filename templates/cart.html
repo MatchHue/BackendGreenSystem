@@ -18,11 +18,11 @@
         </tr>
       </thead>
       <tbody>
-            {%for item in items%}
+            {%for i in range(length)%}
           <tr>
-              <td>{{ item.name }}</td>
-              <td>{{ item.cart_quantity}}</td>
-              <td>{{ item.price }}</td>
+              <td>{{ items[i].name }}</td>
+              <td>{{ carts[i].cart_quantity}}</td>
+              <td>{{ items[i].price }}</td>
           </tr>
           {%endfor%}
       </tbody>
