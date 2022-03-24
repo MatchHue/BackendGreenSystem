@@ -380,7 +380,7 @@ def bulk_logic():
     instance["n"] = len(quantites)
     instance["ProduceQuantity"]=quantites
     instance["Prices"]=prices
-    instance["quantity"]=25
+    instance["quantity"]=20
     result = instance.solve()
 
     selected=result["SelectedProduces"]
@@ -390,7 +390,6 @@ def bulk_logic():
     iterations=len(select)
     # Output the results
     return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
-    #return jsonify(result["SelectedProduces"],result["price"],prices,quantites,users)
 
 
 def get_items(item_name):
@@ -406,6 +405,8 @@ def bulk_purchase():
     form=BulkForm()
     if form.validate_on_submit():
         itemname=form.name.data()
+        quantity=form.quantity.data()
+        bulk_logic(itemname,quantity)
         items=get_items(itemname)
         orders=bulk_logic(items)
         return redirect(url_for('index'))
