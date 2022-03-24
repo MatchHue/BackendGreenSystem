@@ -72,6 +72,12 @@ class SearchForm(FlaskForm):
     Search=StringField("Search",validators=[DataRequired()])
     submit=SubmitField("Search")
 
+class BulkForm(FlaskForm):
+    name=StringField("Username", validators=[DataRequired()])
+    quantity=IntegerField("Quantity", validators=[DataRequired()])
+    sort=SelectField("Sort", choices=[("Price"),("Location"),("Rating")])
+    submit=SubmitField("Confirm")
+
 
 #Models
 
@@ -310,27 +316,19 @@ def get_all_items():
     return all_items
 
 
-@app.route('/bulk_purchase',methods=['GET'])
+@app.route('/bulk_purchase',methods=['GET', 'POST'])
 #@login_required
 def bulk_purchase():
-    items={
-    "user": [
-    {
-    "user_id": 2,
-    "email": "matthew234@mail.com",
-    "username": "Matthew",
-    "items":[
-    {
-    "name":"Pommecythere",
-    "price":"$2 per",
-    "image":"pommecythere.png",
-    "quantity":50
-    }
-        ]
-    }
-         ]
-    }
-    return items
+    items=Item.query.all()
+    form=BulkForm()
+    if form.validate_on_submit():
+        newBulk=Item(name=form.name.data,quantity=form.quantity.data,sort=form.sort.data)
+        db.session.add(newBulk)
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    
+    return render_template('bulk_purchase.html', form=form, items=items)
 
 
 
