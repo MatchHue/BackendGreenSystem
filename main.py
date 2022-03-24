@@ -149,6 +149,10 @@ class Order(db.Model):
     quantity_bought=db.Column(db.Integer,nullable=False)
     order_code=db.Column(db.String,nullable=False)
 
+class Bulk(db.Model):
+    bulk_id=db.Column(db.Integer,primary_key=True)
+    quantity_bought=db.Column(db.Integer,nullable=False)
+
 def getlocation():
     response=requests.get("http://ip-api.com/json/")
     data=response.json()
@@ -397,6 +401,13 @@ def get_items(item_name):
     items=items.filter(Item.name.like('%' + item_name+'%'))
     return items
 
+@app.route('/bulk_purchase2',methods=['POST'])
+def bulk_purchase2():
+    data=request.form
+    quantity=data['quantity']
+    item=data['item']
+
+    return jsonify(quantity,item)
 
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required

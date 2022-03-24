@@ -4,12 +4,12 @@
 {% block content %}
 
 
-<br/>
+<!--<br/>
 <div class="shadow p-3 mb-5 bg-white rounded">
-<form methods="GET" action="/bulk_purchase">
+<form methods="POST" action="/bulk_purchase2">
   <div class="form-group">
     <label for="exampleFormControlSelect1">Items</label>
-    <select class="form-control" id="exampleFormControlSelect1">
+    <select class="form-control" name="item" id="exampleFormControlSelect1">
       {%for item in items%}
       <option>{{item.name}}</option>
         {%endfor%}
@@ -35,7 +35,7 @@
 </div>
 
 
-
+-->
 
 
 
