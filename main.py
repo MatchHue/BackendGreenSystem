@@ -370,9 +370,6 @@ def bulk_logic():
     usernames=get_item_sellers(items)
     quantites=get_item_quantities(items)
     prices=get_items_prices(items)
-
-
-
     # Load Bulk_purchase model from file
     bulkorder = Model("./bulkorder.mzn")
     # Find the MiniZinc solver configuration for coin-bc
