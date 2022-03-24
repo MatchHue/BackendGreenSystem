@@ -324,7 +324,7 @@ from minizinc import Instance, Model, Solver
 def get_item_sellers(items):
     usernames=[]
     for item in items:
-        usernames.append(item.user.username)
+        usernames.append(item.user_id)
     return usernames
 
 def get_item_quantities(items):
@@ -339,7 +339,20 @@ def get_items_prices(items):
         prices.append(int(item.price))
     return prices
 
-def get_users_selected(usernames,results)
+def get_users_selected(usernames,selected):
+    users=[]
+    for i in range(len(selected)):
+        if selected[i]>0:
+            users.append(usernames[i])
+    return users
+
+def get_selected_items(items,selected):
+    item=[]
+    for i in range(len(selected)):
+        if selected[i]>0:
+            item.append(items[i])
+    return item
+
 
 @app.route("/bulk_logic",methods=["GET"])
 def bulk_logic():
@@ -363,8 +376,13 @@ def bulk_logic():
     instance["Prices"]=prices
     instance["quantity"]=30
     result = instance.solve()
+
+    selected=result["SelectedProduces"]
+    users=get_users_selected(usernames,selected)
+    selected_items=get_selected_items(items,selected)
     # Output the results
-    return jsonify(result["SelectedProduces"],result["price"],prices,quantites)
+    return render_template('index.html',items=selected_items)
+    #return jsonify(result["SelectedProduces"],result["price"],prices,quantites,users)
 
 
 def get_items(item_name):
