@@ -1,0 +1,31 @@
+{%extends "layout.html"%}
+
+
+{% block content %}
+<h2>Bulk Purchase</h2>
+
+<br/>
+  
+</div>
+  <br/>
+    <div class="shadow p-3 mb-5 bg-white rounded">
+      <form method="POST" enctype="multipart/form-data">
+          <br/>
+          {{form.name(class="form-control",placeholder="Item Name")}}
+
+          <br/>
+          <div class="row g-3">
+              <div class="col">
+                  {{form.quantity(class="form-control",  placeholder="Quantity in KG")}}
+              </div>
+            </div>
+
+          <br/>
+            {{form.sort(class="form-control", placeholder="Sort by")}}
+          <br/>
+          {{form.submit}}
+      </form>
+      </div>
+
+
+{% endblock %}
