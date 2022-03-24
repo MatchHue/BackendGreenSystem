@@ -2,6 +2,7 @@ from ctypes import sizeof
 from gettext import lngettext
 import json
 from unicodedata import numeric
+from xml.etree.ElementTree import tostring
 from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -317,15 +318,70 @@ def get_all_items():
 
 
 
+
+from minizinc import Instance, Model, Solver
+
+def get_item_sellers(items):
+    usernames=[]
+    for item in items:
+        usernames.append(item.user.username)
+    return usernames
+
+def get_item_quantities(items):
+    quantities=[]
+    for item in items:
+        quantities.append(item.quantity)
+    return quantities
+
+def get_items_prices(items):
+    prices=[]
+    for item in items:
+        prices.append(int(item.price))
+    return prices
+
+def get_users_selected(usernames,results)
+
+@app.route("/bulk_logic",methods=["GET"])
+def bulk_logic():
+
+    items=get_items("pumpkin")
+    usernames=get_item_sellers(items)
+    quantites=get_item_quantities(items)
+    prices=get_items_prices(items)
+
+
+
+    # Load Bulk_purchase model from file
+    bulkorder = Model("./bulkorder.mzn")
+    # Find the MiniZinc solver configuration for coin-bc
+    gecode = Solver.lookup("coin-bc")
+    # Create an Instance of the Bulk_purchase model for coin-bc
+    instance = Instance(gecode, bulkorder)
+    # Assign 4 to n
+    instance["n"] = len(quantites)
+    instance["ProduceQuantity"]=quantites
+    instance["Prices"]=prices
+    instance["quantity"]=30
+    result = instance.solve()
+    # Output the results
+    return jsonify(result["SelectedProduces"],result["price"],prices,quantites)
+
+
+def get_items(item_name):
+    items=Item.query
+    items=items.filter(Item.name.like('%' + item_name+'%'))
+    return items
+
+
 @app.route('/bulk_purchase',methods=['GET', 'POST'])
 @login_required
 def bulk_purchase():
     items=Item.query.all()
     form=BulkForm()
     if form.validate_on_submit():
-        newBulk=Item(name=form.name.data,quantity=form.quantity.data,sort=form.sort.data)
-        db.session.add(newBulk)
-        db.session.commit()
+        itemname=form.name.data()
+        items=get_items(itemname)
+        orders=bulk_logic(items)
         return redirect(url_for('index'))
     
     return render_template('bulk_purchase.html', form=form, items=items)
@@ -589,25 +645,6 @@ def user_location(id):
 
 # OPTIMIZATION 
 
-from minizinc import Instance, Model, Solver
-
-@app.route('/bulk_logic',methods=["GET"])
-def bulk_logic():
-
-    # Load Bulk_purchase model from file
-    bulkorder = Model("./bulkorder.mzn")
-    # Find the MiniZinc solver configuration for coin-bc
-    gecode = Solver.lookup("coin-bc")
-    # Create an Instance of the Bulk_purchase model for coin-bc
-    instance = Instance(gecode, bulkorder)
-    # Assign 4 to n
-    instance["n"] = 4
-    instance["ProduceQuantity"]=[10,5,25,15]
-    instance["Prices"]=[5,7,9,6]
-    instance["quantity"]=50
-    result = instance.solve()
-    # Output the results
-    return jsonify(result["SelectedProduces"],result["price"])
 
 
 if __name__=="__main__":
