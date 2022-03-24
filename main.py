@@ -159,9 +159,11 @@ def index():
     users=User.query.all()
     items=Item.query.all()
     images=[]
+    newitems=[]
     for item in items:
-        images.append(url_for('static',filename='item_images/+item.image'))
-    return render_template('index.html',users=users,items=items,images=images)
+        if item.quantity>0:
+            newitems.append(item)
+    return render_template('index.html',users=users,items=newitems,images=images)
 
 @app.route('/get_location_data',methods=['GET'])
 def testroute():
@@ -419,6 +421,7 @@ def add_bulk_to_cart(itemid,selected):
     cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
     db.session.add(cartItem)
     db.session.commit()
+    flash("Item added to Cart")
     return redirect(url_for('bulk_logic'))
 
 
