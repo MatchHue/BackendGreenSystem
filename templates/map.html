@@ -29,7 +29,7 @@
 
             map.addListener("click", (e) => {
           placeMarkerAndPanTo(e.latLng, map);
-          console.log(e.latLng)
+          console.log(e.latLng.toJSON())
  
         });
 
@@ -48,7 +48,7 @@
 </script>
 <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
 <script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaZyDB6ZZDBtLvyUAS5h0CDtlpvtmdPnA&callback=initMap&v=weekly">
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9MLnp1I2KOKlfVZte6D5KypyGj3InnS8&callback=initMap&v=weekly">
 </script>
 
 

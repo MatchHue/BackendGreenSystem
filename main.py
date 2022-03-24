@@ -310,27 +310,6 @@ def get_all_items():
     return all_items
 
 
-@app.route('/bulk_purchase',methods=['GET'])
-#@login_required
-def bulk_purchase():
-    items={
-    "user": [
-    {
-    "user_id": 2,
-    "email": "matthew234@mail.com",
-    "username": "Matthew",
-    "items":[
-    {
-    "name":"Pommecythere",
-    "price":"$2 per",
-    "image":"pommecythere.png",
-    "quantity":50
-    }
-        ]
-    }
-         ]
-    }
-    return items
 
 
 
@@ -550,52 +529,9 @@ def confirm_order(id):
         flash("Incorrect Code")
         return redirect(url_for('get_orders'))
 
-@app.route('/paynow',methods=['POST'])
-#@login_required
-def paynow():
-    checkout={
-    "user": [
-        {
-            "location": {
-                "longitude ": 10.643411,
-                "latitude": -61.400344
-            }
-        }
-     ],
-    "payment_method": "Cash",
-    "delivery_option": "Pickup"
-    }
 
-    return checkout,201
 
-@app.route('/order_list',methods=['GET'])
-#@login_required
-def order_list():
-    order_list={
-    "user": [
-        {
-            "user_id": 4,
-            "username": "Bob",
-            "email": "bobross@Mail.com",
-            "password": "bobcanpaint123",
-            "phone_number": 1234567,
-            "location": {
-                "longitude ": 10.643411,
-                "latitude": -61.400344
-            }
-        }
-        ],
-        "orders": [
-            {
-                "item_id": 1,
-                "name": "mango",
-                "price": "$3 per",
-                "image": "mango.png",
-                "quantity": 5
-            }
-        ],
-    }
-    return order_list
+
 
 @app.route('/change_location',methods=['GET'])
 def change_location():
@@ -632,6 +568,12 @@ def user_location(id):
     return map._repr_html_()
 
 
+# OPTIMIZATION 
+
+
+@app.route('/bulk_purchase',methods=["GET"])
+def bulk_purchase():
+    
 
 
 if __name__=="__main__":
