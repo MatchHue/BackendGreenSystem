@@ -415,11 +415,13 @@ def bulk_purchase():
     items=Item.query.all()
     form=BulkForm()
     if form.validate_on_submit():
-        itemname=form.name.data()
-        quantity=form.quantity.data()
-        bulk_logic(itemname,quantity)
-        items=get_items(itemname)
-        orders=bulk_logic(items)
+        quantity=form.quantity.data
+        sort=form.sort.data
+        item=form.name.data
+        return jsonify(quantity,sort,item)
+        #bulk_logic(itemname,quantity)
+        #items=get_items(itemname)
+        #orders=bulk_logic(items)
         return redirect(url_for('index'))
     
     return render_template('bulk_purchase.html', form=form, items=items)

@@ -62,6 +62,7 @@
   <br/>
     <div class="shadow p-3 mb-5 bg-white rounded">
       <form method="POST" enctype="multipart/form-data">
+        {{form.hidden_tag()}}
           <br/>
           {{form.name(class="form-control",placeholder="Item Name")}}
 
