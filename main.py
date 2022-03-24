@@ -570,10 +570,25 @@ def user_location(id):
 
 # OPTIMIZATION 
 
+from minizinc import Instance, Model, Solver
 
 @app.route('/bulk_purchase',methods=["GET"])
 def bulk_purchase():
-    
+
+    # Load Bulk_purchase model from file
+    bulkorder = Model("./bulkorder.mzn")
+    # Find the MiniZinc solver configuration for coin-bc
+    gecode = Solver.lookup("coin-bc")
+    # Create an Instance of the Bulk_purchase model for coin-bc
+    instance = Instance(gecode, bulkorder)
+    # Assign 4 to n
+    instance["n"] = 4
+    instance["ProduceQuantity"]=[10,5,25,15]
+    instance["Prices"]=[5,7,9,6]
+    instance["quantity"]=50
+    result = instance.solve()
+    # Output the results
+    return jsonify(result["SelectedProduces"],result["price"])
 
 
 if __name__=="__main__":
