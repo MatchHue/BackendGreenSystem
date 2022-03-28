@@ -326,7 +326,7 @@ def get_all_items():
 
 
 
-from minizinc import Instance, Model, Solver
+import minizinc
 
 def get_item_sellers(items):
     usernames=[]
@@ -375,11 +375,11 @@ def bulk_logic(items,quantites,prices,usernames,quantity):
     #quantites=get_item_quantities(items)
      # prices=get_items_prices(items)
     # Load Bulk_purchase model from file
-    bulkorder = Model("./bulkorder.mzn")
+    bulkorder = minizinc.Model("./bulkorder.mzn")
     # Find the MiniZinc solver configuration for coin-bc
-    gecode = Solver.lookup("coin-bc")
+    gecode = minizinc.Solver.lookup("coin-bc")
     # Create an Instance of the Bulk_purchase model for coin-bc
-    instance = Instance(gecode, bulkorder)
+    instance = minizinc.Instance(gecode, bulkorder)
     # Assign 4 to n
     instance["n"] = len(quantites)
     instance["ProduceQuantity"]=quantites
