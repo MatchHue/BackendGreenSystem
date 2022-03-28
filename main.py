@@ -75,8 +75,9 @@ class SearchForm(FlaskForm):
 
 class BulkForm(FlaskForm):
     name=StringField("Username", validators=[DataRequired()])
-    quantity=IntegerField("Quantity", validators=[DataRequired()])
+    quantity=StringField("Quantity", validators=[DataRequired()])
     sort=SelectField("Sort", choices=[("Price"),("Location"),("Rating")])
+    checkbox = BooleanField("Multiple")
     submit=SubmitField("Confirm")
 
 
@@ -403,31 +404,68 @@ def bulk_purchase():
         quantity=form.quantity.data
         sort=form.sort.data
         item=form.name.data
+        checkbox=form.checkbox.data
+        itemsfromitem=[]
+        quantitesfromquantity=[]
 
-        items=get_items(item)
-        usernames=get_item_sellers(items)
-        quantites=get_item_quantities(items)
-        prices=get_items_prices(items)
-        Sum=sum(quantites)
+        if checkbox is True:
+            listofitems=[]
+            listofselected=[]
+            itemsfromitem=item.split()
+            quantitesfromquantity=quantity.split()
+            iter=len(itemsfromitem)
+            iterations=0
+            for i in range(iter):
+                item=itemsfromitem[i]
+                quantity=quantitesfromquantity[i]
+                
+                items=get_items(item)
+                usernames=get_item_sellers(items)
+                quantites=get_item_quantities(items)
+                prices=get_items_prices(items)
+                Sum=sum(quantites)
+                if int(quantity)>Sum:
+                    message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                    flash(message)
+                    return redirect(url_for('bulk_purchase'))
+                #getting items from miniinc module
+                results=bulk_logic(items,quantites,prices,usernames,int(quantity))
 
-        if quantity>Sum:
-            message="Error cannot query order as given quantity is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
-            flash(message)
-            return redirect(url_for('bulk_purchase'))
-        #getting items from miniinc module
-        results=bulk_logic(items,quantites,prices,usernames,quantity)
+                selected=results["SelectedProduces"]
+                users=get_users_selected(usernames,selected)
+                selected_items=get_selected_items(items,selected)
+                select=selected_selected(selected)
+                for i in selected_items:
+                    listofitems.append(i)
+                for i in select:
+                    listofselected.append(i)
+                iterations=iterations+len(select)
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+        else:
+            items=get_items(item)
+            usernames=get_item_sellers(items)
+            quantites=get_item_quantities(items)
+            prices=get_items_prices(items)
+            Sum=sum(quantites)
+
+            if int(quantity)>Sum:
+                message="Error cannot query order as given quantity is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                flash(message)
+                return redirect(url_for('bulk_purchase'))
+            #getting items from miniinc module
+            results=bulk_logic(items,quantites,prices,usernames,int(quantity))
 
 
-        selected=results["SelectedProduces"]
-        users=get_users_selected(usernames,selected)
-        selected_items=get_selected_items(items,selected)
-        select=selected_selected(selected)
-        iterations=len(select)
-        return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
-        #bulk_logic(itemname,quantity)
-        #items=get_items(itemname)
-        #orders=bulk_logic(items)
-        return redirect(url_for('index'))
+            selected=results["SelectedProduces"]
+            users=get_users_selected(usernames,selected)
+            selected_items=get_selected_items(items,selected)
+            select=selected_selected(selected)
+            iterations=len(select)
+            return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
+            #bulk_logic(itemname,quantity)
+            #items=get_items(itemname)
+            #orders=bulk_logic(items)
+            return redirect(url_for('index'))
     
     return render_template('bulk_purchase.html', form=form, items=items)
 

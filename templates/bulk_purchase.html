@@ -64,9 +64,12 @@
     <div class="shadow p-3 mb-5 bg-white rounded">
       <form method="POST" enctype="multipart/form-data">
         {{form.hidden_tag()}}
-          <br/>
-          {{form.name(class="form-control",placeholder="Item Name")}}
 
+          <br/>
+          {{form.name(class="form-control",placeholder="Enter names of items")}}
+
+          {{form.checkbox}}<span>Multiple Items</span>
+          <br/>
           <br/>
           <div class="row g-3">
               <div class="col">
