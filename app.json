@@ -2,5 +2,10 @@
     "name": "Flask MVC",
     "description": "A MVC Template for Flask Apps",
     "repository": "https://github.com/MatchHue/BackendGreenSystem",
-    "keywords": ["flask", "mvc", "foood"]
+    "keywords": ["flask", "mvc", "foood"],
+    "buildpacks": [
+      {
+        "url": "https://github.com/peterkeen/heroku-buildpack-vendorbinaries"
+      }
+    ]
   }
