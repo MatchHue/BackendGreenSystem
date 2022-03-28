@@ -367,13 +367,12 @@ def selected_selected(selected):
     return select
 
 
-@app.route("/bulk_logic",methods=["GET"])
-def bulk_logic():
+def bulk_logic(items,quantites,prices,usernames,quantity):
 
-    items=get_items("pumpkin")
-    usernames=get_item_sellers(items)
-    quantites=get_item_quantities(items)
-    prices=get_items_prices(items)
+   # items=get_items("pumpkin")
+    #usernames=get_item_sellers(items)
+    #quantites=get_item_quantities(items)
+     # prices=get_items_prices(items)
     # Load Bulk_purchase model from file
     bulkorder = Model("./bulkorder.mzn")
     # Find the MiniZinc solver configuration for coin-bc
@@ -384,30 +383,16 @@ def bulk_logic():
     instance["n"] = len(quantites)
     instance["ProduceQuantity"]=quantites
     instance["Prices"]=prices
-    instance["quantity"]=20
+    instance["quantity"]=quantity
     result = instance.solve()
-
-    selected=result["SelectedProduces"]
-    users=get_users_selected(usernames,selected)
-    selected_items=get_selected_items(items,selected)
-    select=selected_selected(selected)
-    iterations=len(select)
     # Output the results
-    return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
+    return result
 
 
 def get_items(item_name):
     items=Item.query
     items=items.filter(Item.name.like('%' + item_name+'%'))
     return items
-
-@app.route('/bulk_purchase2',methods=['POST'])
-def bulk_purchase2():
-    data=request.form
-    quantity=data['quantity']
-    item=data['item']
-
-    return jsonify(quantity,item)
 
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
@@ -418,7 +403,27 @@ def bulk_purchase():
         quantity=form.quantity.data
         sort=form.sort.data
         item=form.name.data
-        return jsonify(quantity,sort,item)
+
+        items=get_items(item)
+        usernames=get_item_sellers(items)
+        quantites=get_item_quantities(items)
+        prices=get_items_prices(items)
+        Sum=sum(quantites)
+
+        if quantity>Sum:
+            message="Error cannot query order as given quantity is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+            flash(message)
+            return redirect(url_for('bulk_purchase'))
+        #getting items from miniinc module
+        results=bulk_logic(items,quantites,prices,usernames,quantity)
+
+
+        selected=results["SelectedProduces"]
+        users=get_users_selected(usernames,selected)
+        selected_items=get_selected_items(items,selected)
+        select=selected_selected(selected)
+        iterations=len(select)
+        return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
         #bulk_logic(itemname,quantity)
         #items=get_items(itemname)
         #orders=bulk_logic(items)
