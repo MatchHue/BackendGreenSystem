@@ -39,6 +39,7 @@
 
 <h1 style="text-align: center;">LIST OF ORDERS</h1>
 <br/>
+<h1 style="text-align: center; color: rgb(0, 0, 0);">Items you Bought</h1>
 <div class='container'>
     <div class="row">
     {% for i in range(bl)%}
@@ -68,6 +69,7 @@
 
 <br/>
 <div class='container'>
+    <h1 style="text-align: center; color: rgb(0, 0, 0);">Items Bought from You</h1>
     <div class="row">
     {% for i in range(sl)%}
     {%if sellers_orders[i].seller_id==current_user.id %}

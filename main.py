@@ -2,6 +2,7 @@ from ctypes import sizeof
 from gettext import lngettext
 import json
 from unicodedata import numeric
+from xml.etree.ElementTree import tostring
 from flask import Flask, render_template,request,redirect, session,url_for,redirect,jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -74,8 +75,9 @@ class SearchForm(FlaskForm):
 
 class BulkForm(FlaskForm):
     name=StringField("Username", validators=[DataRequired()])
-    quantity=IntegerField("Quantity", validators=[DataRequired()])
+    quantity=StringField("Quantity", validators=[DataRequired()])
     sort=SelectField("Sort", choices=[("Price"),("Location"),("Rating")])
+    checkbox = BooleanField("Multiple")
     submit=SubmitField("Confirm")
 
 
@@ -148,6 +150,10 @@ class Order(db.Model):
     quantity_bought=db.Column(db.Integer,nullable=False)
     order_code=db.Column(db.String,nullable=False)
 
+class Bulk(db.Model):
+    bulk_id=db.Column(db.Integer,primary_key=True)
+    quantity_bought=db.Column(db.Integer,nullable=False)
+
 def getlocation():
     response=requests.get("http://ip-api.com/json/")
     data=response.json()
@@ -158,9 +164,11 @@ def index():
     users=User.query.all()
     items=Item.query.all()
     images=[]
+    newitems=[]
     for item in items:
-        images.append(url_for('static',filename='item_images/+item.image'))
-    return render_template('index.html',users=users,items=items,images=images)
+        if item.quantity>0:
+            newitems.append(item)
+    return render_template('index.html',users=users,items=newitems,images=images)
 
 @app.route('/get_location_data',methods=['GET'])
 def testroute():
@@ -316,19 +324,159 @@ def get_all_items():
     return all_items
 
 
-@app.route('/bulk_purchase',methods=['GET', 'POST'])
-#@login_required
+
+
+from minizinc import Instance, Model, Solver
+
+def get_item_sellers(items):
+    usernames=[]
+    for item in items:
+        usernames.append(item.user_id)
+    return usernames
+
+def get_item_quantities(items):
+    quantities=[]
+    for item in items:
+        quantities.append(item.quantity)
+    return quantities
+
+def get_items_prices(items):
+    prices=[]
+    for item in items:
+        prices.append(int(item.price))
+    return prices
+
+def get_users_selected(usernames,selected):
+    users=[]
+    for i in range(len(selected)):
+        if selected[i]>0:
+            users.append(usernames[i])
+    return users
+
+def get_selected_items(items,selected):
+    item=[]
+    for i in range(len(selected)):
+        if selected[i]>0:
+            item.append(items[i])
+    return item
+
+def selected_selected(selected):
+    select=[]
+    for i in range(len(selected)):
+        if selected[i]>0:
+            select.append(selected[i])
+    return select
+
+
+def bulk_logic(items,quantites,prices,usernames,quantity):
+
+   # items=get_items("pumpkin")
+    #usernames=get_item_sellers(items)
+    #quantites=get_item_quantities(items)
+     # prices=get_items_prices(items)
+    # Load Bulk_purchase model from file
+    bulkorder = Model("./bulkorder.mzn")
+    # Find the MiniZinc solver configuration for coin-bc
+    gecode = Solver.lookup("coin-bc")
+    # Create an Instance of the Bulk_purchase model for coin-bc
+    instance = Instance(gecode, bulkorder)
+    # Assign 4 to n
+    instance["n"] = len(quantites)
+    instance["ProduceQuantity"]=quantites
+    instance["Prices"]=prices
+    instance["quantity"]=quantity
+    result = instance.solve()
+    # Output the results
+    return result
+
+
+def get_items(item_name):
+    items=Item.query
+    items=items.filter(Item.name.like('%' + item_name+'%'))
+    return items
+
+@app.route('/bulk_purchase',methods=['GET','POST'])
+@login_required
 def bulk_purchase():
     items=Item.query.all()
     form=BulkForm()
     if form.validate_on_submit():
-        newBulk=Item(name=form.name.data,quantity=form.quantity.data,sort=form.sort.data)
-        db.session.add(newBulk)
-        db.session.commit()
-        return redirect(url_for('index'))
+        quantity=form.quantity.data
+        sort=form.sort.data
+        item=form.name.data
+        checkbox=form.checkbox.data
+        itemsfromitem=[]
+        quantitesfromquantity=[]
 
+        if checkbox is True:
+            listofitems=[]
+            listofselected=[]
+            itemsfromitem=item.split()
+            quantitesfromquantity=quantity.split()
+            iter=len(itemsfromitem)
+            iterations=0
+            for i in range(iter):
+                item=itemsfromitem[i]
+                quantity=quantitesfromquantity[i]
+                
+                items=get_items(item)
+                usernames=get_item_sellers(items)
+                quantites=get_item_quantities(items)
+                prices=get_items_prices(items)
+                Sum=sum(quantites)
+                if int(quantity)>Sum:
+                    message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                    flash(message)
+                    return redirect(url_for('bulk_purchase'))
+                #getting items from miniinc module
+                results=bulk_logic(items,quantites,prices,usernames,int(quantity))
+
+                selected=results["SelectedProduces"]
+                users=get_users_selected(usernames,selected)
+                selected_items=get_selected_items(items,selected)
+                select=selected_selected(selected)
+                for i in selected_items:
+                    listofitems.append(i)
+                for i in select:
+                    listofselected.append(i)
+                iterations=iterations+len(select)
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+        else:
+            items=get_items(item)
+            usernames=get_item_sellers(items)
+            quantites=get_item_quantities(items)
+            prices=get_items_prices(items)
+            Sum=sum(quantites)
+
+            if int(quantity)>Sum:
+                message="Error cannot query order as given quantity is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                flash(message)
+                return redirect(url_for('bulk_purchase'))
+            #getting items from miniinc module
+            results=bulk_logic(items,quantites,prices,usernames,int(quantity))
+
+
+            selected=results["SelectedProduces"]
+            users=get_users_selected(usernames,selected)
+            selected_items=get_selected_items(items,selected)
+            select=selected_selected(selected)
+            iterations=len(select)
+            return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
+            #bulk_logic(itemname,quantity)
+            #items=get_items(itemname)
+            #orders=bulk_logic(items)
+            return redirect(url_for('index'))
     
     return render_template('bulk_purchase.html', form=form, items=items)
+
+@app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
+def add_bulk_to_cart(itemid,selected):
+    user=current_user.id
+    cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
+    db.session.add(cartItem)
+    db.session.commit()
+    flash("Item added to Cart")
+    return redirect(url_for('bulk_logic'))
 
 
 
@@ -433,13 +581,15 @@ def add_to_cart(id):
 def get_cart():
     user=User.query.get(current_user.id)
     items=[]
+    cartitems=[]
     carts=Cart.query.all()
     for c in user.cart:
         item=Item.query.get(c.item_id)
         cart=Cart.query.get(c.cart_id)
         items.append(item)
-        items.append(cart)
-    return render_template('cart.html',items=items,user=user,carts=carts)
+        cartitems.append(cart)
+    l=len(items)
+    return render_template('cart.html',items=items,user=user,carts=cartitems,length=l)
 
 
 def  generate_order_code():
@@ -548,52 +698,9 @@ def confirm_order(id):
         flash("Incorrect Code")
         return redirect(url_for('get_orders'))
 
-@app.route('/paynow',methods=['POST'])
-#@login_required
-def paynow():
-    checkout={
-    "user": [
-        {
-            "location": {
-                "longitude ": 10.643411,
-                "latitude": -61.400344
-            }
-        }
-     ],
-    "payment_method": "Cash",
-    "delivery_option": "Pickup"
-    }
 
-    return checkout,201
 
-@app.route('/order_list',methods=['GET'])
-#@login_required
-def order_list():
-    order_list={
-    "user": [
-        {
-            "user_id": 4,
-            "username": "Bob",
-            "email": "bobross@Mail.com",
-            "password": "bobcanpaint123",
-            "phone_number": 1234567,
-            "location": {
-                "longitude ": 10.643411,
-                "latitude": -61.400344
-            }
-        }
-        ],
-        "orders": [
-            {
-                "item_id": 1,
-                "name": "mango",
-                "price": "$3 per",
-                "image": "mango.png",
-                "quantity": 5
-            }
-        ],
-    }
-    return order_list
+
 
 @app.route('/change_location',methods=['GET'])
 def change_location():
@@ -629,6 +736,8 @@ def user_location(id):
     folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location ").add_to(map)
     return map._repr_html_()
 
+
+# OPTIMIZATION 
 
 
 

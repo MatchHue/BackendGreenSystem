@@ -2,6 +2,59 @@
 
 
 {% block content %}
+
+
+<!--<br/>
+<div class="shadow p-3 mb-5 bg-white rounded">
+<form methods="POST" action="/bulk_purchase2">
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Items</label>
+    <select class="form-control" name="item" id="exampleFormControlSelect1">
+      {%for item in items%}
+      <option>{{item.name}}</option>
+        {%endfor%}
+    </select>
+  </div>
+  <div class="form-group ">
+    <label for="inputPassword2" class="sr-only">Quantity</label>
+    <input type="number"  class="form-control" id="quantity" name="quantity" placeholder="Quantity">
+  </div>
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Filter By</label>
+    <select class="form-control" id="exampleFormControlSelect1">
+      <option>Price</option>
+      <option>Location</option>
+      <option>Rating</option>
+    </select>
+  </div>
+  <div>
+    <br/>
+    <button type="submit" class="btn btn-primary mb-2">Confirm </button>
+  </div>
+</form>
+</div>
+
+
+-->
+
+
+{% for message in get_flashed_messages() %}
+
+<div class="alert alert-warning alert-dismissible show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+
+    {%endfor%}
+
+
+
+
+
+
 <h2>Bulk Purchase</h2>
 
 <br/>
@@ -10,9 +63,13 @@
   <br/>
     <div class="shadow p-3 mb-5 bg-white rounded">
       <form method="POST" enctype="multipart/form-data">
-          <br/>
-          {{form.name(class="form-control",placeholder="Item Name")}}
+        {{form.hidden_tag()}}
 
+          <br/>
+          {{form.name(class="form-control",placeholder="Enter names of items")}}
+
+          {{form.checkbox}}<span>Multiple Items</span>
+          <br/>
           <br/>
           <div class="row g-3">
               <div class="col">
