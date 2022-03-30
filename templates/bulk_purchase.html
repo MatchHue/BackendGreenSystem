@@ -2,30 +2,41 @@
 
 
 {% block content %}
-<h2>Bulk Purchase</h2>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+<h2 class="bulk-name">Bulk Purchase</h2>
 
 <br/>
   
-</div>
+<div class="bulk">
   <br/>
-    <div class="shadow p-3 mb-5 bg-white rounded">
+    <div class="shadow p-3 mb-5 bg-white rounded" style="margin-left: 20px">
       <form method="POST" enctype="multipart/form-data">
+        <select class="form-select" aria-label="Items">
+            <option selected>Items</option>
+            {% for item in items %}
+            <option>{{item.name}} - ({{item.quantity}} KG available)</option>
+            {% endfor %}
+        </select>
+<!--
           <br/>
           {{form.name(class="form-control",placeholder="Item Name")}}
-
+-->
           <br/>
-          <div class="row g-3">
+          <div class="col g-3" style="font-family: Arial, Helvetica, sans-serif;">
               <div class="col">
                   {{form.quantity(class="form-control",  placeholder="Quantity in KG")}}
               </div>
-            </div>
-
-          <br/>
-            {{form.sort(class="form-control", placeholder="Sort by")}}
+              <br/>
+              <div class="col">
+                  {{form.sort(class="form-control", placeholder="Sort by")}}
+              </div>
+              
+          </div>
           <br/>
           {{form.submit}}
+          <br/>
       </form>
       </div>
-
+</div>
 
 {% endblock %}
