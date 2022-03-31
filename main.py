@@ -398,6 +398,7 @@ def get_items(item_name):
 import math
 
 def convert_to_km(lat1,lon1,lat2,lon2):
+    #radius of earth in km
     R=6371
     #lat1=10.315049
     #lon1=-61.431314
@@ -411,6 +412,7 @@ def convert_to_km(lat1,lon1,lat2,lon2):
     a=math.sin(deltalat/2)*math.sin(deltalat/2)+math.cos(phi1)*math.cos(phi2)*math.sin(deltalon/2)*math.sin(deltalon/2)
     c=2*math.atan2(math.sqrt(a),math.sqrt(1-a))
 
+    #distance between both users in km
     d=R*c
     return d
 
@@ -431,14 +433,6 @@ def bulk_by_location(sellerslocation,quantity,quantites):
     return result
 
 
-@app.route("/testrequest",methods=['POST'])
-def testrequest():
-    if request.method == "POST":
-        select = request.form.getlist('items')
-
-        data=request.form
-        items=data["quantities"]
-        return (str(items))
 
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
