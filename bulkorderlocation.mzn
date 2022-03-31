@@ -7,7 +7,7 @@ int:n;
 %array[1..n] of int: selecteQuantites;
 
 array[1..n] of int: ProduceQuantity;
-array[1..n] of int: DistanceBetween;
+array[1..n] of float: DistanceBetween;
 
 int:quantity;
 
@@ -31,7 +31,7 @@ constraint sumItems <= totalProducts;
 
 constraint forall(i in 1..n)( SelectedProduces[i] <= ProduceQuantity[i]);
 
-var int: choosenlocation;
+var float: choosenlocation;
 choosenlocation = sum(j in 1..n)(SelectedProduces[j]*DistanceBetween[j]);
 
 solve minimize choosenlocation;

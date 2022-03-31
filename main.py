@@ -90,8 +90,8 @@ class User(db.Model,UserMixin):
     email=db.Column(db.String,unique=True,nullable=False)
     phone_number=db.Column(db.Integer,unique=True)
     password=db.Column(db.String,nullable=False)
-    longtitude=db.Column(db.Numeric,nullable=False)
-    latitude=db.Column(db.Numeric,nullable=False)
+    longtitude=db.Column(db.Float,nullable=False)
+    latitude=db.Column(db.Float,nullable=False)
     items=db.relationship('Item',backref='user')
     cart=db.relationship('Cart',backref='user')
 
@@ -414,7 +414,7 @@ def convert_to_km(lat1,lon1,lat2,lon2):
     d=R*c
     return d
 
-def bulk_by_location(buyerlocation, sellerslocation,quantity,quantites):
+def bulk_by_location(sellerslocation,quantity,quantites):
     
     bulkorder = minizinc.Model("./bulkorderlocation.mzn")
     # Find the MiniZinc solver configuration for coin-bc
@@ -430,6 +430,9 @@ def bulk_by_location(buyerlocation, sellerslocation,quantity,quantites):
     # Output the results
     return result
 
+
+
+
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
 def bulk_purchase():
@@ -442,6 +445,22 @@ def bulk_purchase():
         checkbox=form.checkbox.data
         itemsfromitem=[]
         quantitesfromquantity=[]
+
+        if sort=="Location":
+            items=get_items(item)
+            usernames=get_item_sellers(items)
+            quantities=get_item_quantities(items)
+            buyer=current_user
+            locationsinkm=[]
+            for item in items:
+                converted=convert_to_km(buyer.latitude,buyer.longtitude,item.user.latitude,item.user.longtitude)
+                locationsinkm.append(converted)
+            results=bulk_by_location(locationsinkm,int(quantity),quantities)
+            selected=results["SelectedProduces"]
+            selected_items=get_selected_items(items,selected)
+            select=selected_selected(selected)
+            iterations=len(select)
+            return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
 
         if checkbox is True:
             listofitems=[]

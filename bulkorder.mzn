@@ -7,7 +7,7 @@ int:n;
 %array[1..n] of int: selecteQuantites;
 
 array[1..n] of int: ProduceQuantity ;
-array[1..n] of int: Prices;
+array[1..n] of float: Prices;
 
 int:quantity;
 
@@ -31,7 +31,7 @@ constraint sumItems <= totalProducts;
 
 constraint forall(i in 1..n)( SelectedProduces[i] <= ProduceQuantity[i]);
 
-var int: price;
+var float: price;
 price = sum(j in 1..n)(SelectedProduces[j]*Prices[j]);
 
 solve minimize price;
