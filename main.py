@@ -519,7 +519,7 @@ def bulk_purchase():
                     listofitems.append(i)
                 for i in select:
                     listofselected.append(i)
-                iterations=iterations+len(listofitems)
+            iterations=len(listofitems)
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
     
     return render_template('bulk_purchase.html', form=form, items=items)
