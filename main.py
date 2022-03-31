@@ -446,7 +446,7 @@ def bulk_purchase():
     items=Item.query.all()
     form=BulkForm()
     if request.method=="POST":
-        items=request.form.getlist('items')
+        litems=request.form.getlist('items')
         quantities=request.form["quantities"]
         sort=request.form.get('sort')
         itemsfromitem=[]
@@ -456,9 +456,9 @@ def bulk_purchase():
         listofselected=[]
         iterations=0
 
-        for i in items:
+        for i in litems:
             itemsfromitem.append(i)
-        iter=len(items)
+        iter=len(litems)
 
         if sort=="Price":
             for i in range(iter):
@@ -490,7 +490,6 @@ def bulk_purchase():
 
 
         if sort=="Location":
-
             buyer=current_user
 
             for i in range(iter):
@@ -502,10 +501,9 @@ def bulk_purchase():
                 quantities=get_item_quantities(items)
                 
                 locationsinkm=[]
-                for item in items:
-                    converted=convert_to_km(buyer.latitude,buyer.longtitude,item.user.latitude,item.user.longtitude)
+                for i in items:
+                    converted=convert_to_km(buyer.latitude,buyer.longtitude,i.user.latitude,i.user.longtitude)
                     locationsinkm.append(converted)
-
                 Sum=sum(quantities)
                 if int(quantity)>Sum:
                     message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
@@ -517,12 +515,11 @@ def bulk_purchase():
                 selected=results["SelectedProduces"]
                 selected_items=get_selected_items(items,selected)
                 select=selected_selected(selected)
-                iterations=len(select)
                 for i in selected_items:
                     listofitems.append(i)
                 for i in select:
                     listofselected.append(i)
-                iterations=iterations+len(select)
+                iterations=iterations+len(listofitems)
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
     
     return render_template('bulk_purchase.html', form=form, items=items)
