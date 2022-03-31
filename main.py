@@ -395,6 +395,41 @@ def get_items(item_name):
     items=items.filter(Item.name.like('%' + item_name+'%'))
     return items
 
+import math
+
+def convert_to_km(lat1,lon1,lat2,lon2):
+    R=6371
+    #lat1=10.315049
+    #lon1=-61.431314
+    #lat2=10.632447
+    #lon2=-61.429257
+    phi1=lat1*math.pi/180
+    phi2=lat2*math.pi/180
+    deltalat=(lat2-lat1)*math.pi/180
+    deltalon=(lon2-lon1)*math.pi/180
+
+    a=math.sin(deltalat/2)*math.sin(deltalat/2)+math.cos(phi1)*math.cos(phi2)*math.sin(deltalon/2)*math.sin(deltalon/2)
+    c=2*math.atan2(math.sqrt(a),math.sqrt(1-a))
+
+    d=R*c
+    return d
+
+def bulk_by_location(buyerlocation, sellerslocation,quantity,quantites):
+    
+    bulkorder = minizinc.Model("./bulkorderlocation.mzn")
+    # Find the MiniZinc solver configuration for coin-bc
+    gecode = minizinc.Solver.lookup("coin-bc")
+    # Create an Instance of the Bulk_purchase model for coin-bc
+    instance = minizinc.Instance(gecode, bulkorder)
+    # Assign 4 to n
+    instance["n"] = len(quantites)
+    instance["ProduceQuantity"]=quantites
+    instance["DistanceBetween"]=sellerslocation
+    instance["quantity"]=quantity
+    result = instance.solve()
+    # Output the results
+    return result
+
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
 def bulk_purchase():
