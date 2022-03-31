@@ -58,31 +58,30 @@
 <h2>Bulk Purchase</h2>
 
 <br/>
-  
+<div class="shadow p-3 mb-5 bg-white rounded">
+<form class="form-inline"  method="POST" action="/bulk_purchase">
+  <div class="mb-3">
+    <label for="itemselect" class="form-label">Select Items</label>
+  <select id="itemselect" class="form-select" name="items"  multiple data-max-options="2" aria-label="multiple select example">
+  {%for item in items%}
+  <option value="{{item.name}}">{{item.name}}</option>
+  {%endfor%}
+</select>
 </div>
-  <br/>
-    <div class="shadow p-3 mb-5 bg-white rounded">
-      <form method="POST" enctype="multipart/form-data">
-        {{form.hidden_tag()}}
+<div class="mb-3">
+  <label for="quantity" class="form-label">Enter The Quantities</label>
+  <input type="text" class="form-control" name="quantities" id="quantities">
+</div>
 
-          <br/>
-          {{form.name(class="form-control",placeholder="Enter names of items")}}
+<div><select class="form-select" name="sort"aria-label="Default select example">
+  <option value="Price">Price</option>
+  <option value="Location">Location</option>
+</select></div>
+<button type="submit" class="btn btn-primary mb-2">Confirm order</button>
+</form>
+</div>
 
-          {{form.checkbox}}<span>Multiple Items</span>
-          <br/>
-          <br/>
-          <div class="row g-3">
-              <div class="col">
-                  {{form.quantity(class="form-control",  placeholder="Quantity in KG")}}
-              </div>
-            </div>
 
-          <br/>
-            {{form.sort(class="form-control", placeholder="Sort by")}}
-          <br/>
-          {{form.submit}}
-      </form>
-      </div>
 
 
 {% endblock %}
