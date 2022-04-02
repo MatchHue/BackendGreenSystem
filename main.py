@@ -439,6 +439,10 @@ def bulk_by_location(sellerslocation,quantity,quantites):
 def bulk_purchase():
     items=Item.query.all()
     form=BulkForm()
+    litems=[]
+    for item in items:
+        if item.quantity>0:
+            litems.append(item)
     if request.method=="POST":
         litems=request.form.getlist('items')
         quantities=request.form["quantities"]
@@ -516,7 +520,7 @@ def bulk_purchase():
             iterations=len(listofitems)
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
     
-    return render_template('bulk_purchase.html', form=form, items=items)
+    return render_template('bulk_purchase.html', form=form, items=litems)
 
 @app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
 def add_bulk_to_cart(itemid,selected):
