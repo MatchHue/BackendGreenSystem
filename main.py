@@ -16,7 +16,7 @@ from flask_login import UserMixin, login_user, login_manager, login_required, lo
 import os
 import requests
 import folium
-import string#,random
+import string,random
 
 
 app=Flask(__name__)
