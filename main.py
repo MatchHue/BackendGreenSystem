@@ -90,8 +90,8 @@ class User(db.Model,UserMixin):
     email=db.Column(db.String,unique=True,nullable=False)
     phone_number=db.Column(db.Integer,unique=True)
     password=db.Column(db.String,nullable=False)
-    longtitude=db.Column(db.Float,nullable=False)
-    latitude=db.Column(db.Float,nullable=False)
+    longtitude=db.Column(db.Numeric,nullable=False)
+    latitude=db.Column(db.Numeric,nullable=False)
     items=db.relationship('Item',backref='user')
     cart=db.relationship('Cart',backref='user')
 
@@ -326,7 +326,7 @@ def get_all_items():
 
 
 
-import minizinc
+from minizinc import Instance, Model, Solver
 
 def get_item_sellers(items):
     usernames=[]
@@ -375,11 +375,11 @@ def bulk_logic(items,quantites,prices,usernames,quantity):
     #quantites=get_item_quantities(items)
      # prices=get_items_prices(items)
     # Load Bulk_purchase model from file
-    bulkorder = minizinc.Model("./bulkorder.mzn")
+    bulkorder = Model("./bulkorder.mzn")
     # Find the MiniZinc solver configuration for coin-bc
-    gecode = minizinc.Solver.lookup("coin-bc")
+    gecode = Solver.lookup("coin-bc")
     # Create an Instance of the Bulk_purchase model for coin-bc
-    instance = minizinc.Instance(gecode, bulkorder)
+    instance = Instance(gecode, bulkorder)
     # Assign 4 to n
     instance["n"] = len(quantites)
     instance["ProduceQuantity"]=quantites
@@ -395,70 +395,26 @@ def get_items(item_name):
     items=items.filter(Item.name.like('%' + item_name+'%'))
     return items
 
-import math
-
-def convert_to_km(lat1,lon1,lat2,lon2):
-    #radius of earth in km
-    R=6371
-    #lat1=10.315049
-    #lon1=-61.431314
-    #lat2=10.632447
-    #lon2=-61.429257
-    phi1=lat1*math.pi/180
-    phi2=lat2*math.pi/180
-    deltalat=(lat2-lat1)*math.pi/180
-    deltalon=(lon2-lon1)*math.pi/180
-
-    a=math.sin(deltalat/2)*math.sin(deltalat/2)+math.cos(phi1)*math.cos(phi2)*math.sin(deltalon/2)*math.sin(deltalon/2)
-    c=2*math.atan2(math.sqrt(a),math.sqrt(1-a))
-
-    #distance between both users in km
-    d=R*c
-    return d
-
-def bulk_by_location(sellerslocation,quantity,quantites):
-    
-    bulkorder = minizinc.Model("./bulkorderlocation.mzn")
-    # Find the MiniZinc solver configuration for coin-bc
-    gecode = minizinc.Solver.lookup("coin-bc")
-    # Create an Instance of the Bulk_purchase model for coin-bc
-    instance = minizinc.Instance(gecode, bulkorder)
-    # Assign 4 to n
-    instance["n"] = len(quantites)
-    instance["ProduceQuantity"]=quantites
-    instance["DistanceBetween"]=sellerslocation
-    instance["quantity"]=quantity
-    result = instance.solve()
-    # Output the results
-    return result
-
-
-
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
 def bulk_purchase():
     items=Item.query.all()
     form=BulkForm()
-    litems=[]
-    for item in items:
-        if item.quantity>0:
-            litems.append(item)
-    if request.method=="POST":
-        litems=request.form.getlist('items')
-        quantities=request.form["quantities"]
-        sort=request.form.get('sort')
+    if form.validate_on_submit():
+        quantity=form.quantity.data
+        sort=form.sort.data
+        item=form.name.data
+        checkbox=form.checkbox.data
         itemsfromitem=[]
         quantitesfromquantity=[]
-        quantitesfromquantity=quantities.split(',')
-        listofitems=[]
-        listofselected=[]
-        iterations=0
 
-        for i in litems:
-            itemsfromitem.append(i)
-        iter=len(litems)
-
-        if sort=="Price":
+        if checkbox is True:
+            listofitems=[]
+            listofselected=[]
+            itemsfromitem=item.split()
+            quantitesfromquantity=quantity.split()
+            iter=len(itemsfromitem)
+            iterations=0
             for i in range(iter):
                 item=itemsfromitem[i]
                 quantity=quantitesfromquantity[i]
@@ -485,42 +441,33 @@ def bulk_purchase():
                     listofselected.append(i)
                 iterations=iterations+len(select)
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+        else:
+            items=get_items(item)
+            usernames=get_item_sellers(items)
+            quantites=get_item_quantities(items)
+            prices=get_items_prices(items)
+            Sum=sum(quantites)
+
+            if int(quantity)>Sum:
+                message="Error cannot query order as given quantity is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                flash(message)
+                return redirect(url_for('bulk_purchase'))
+            #getting items from miniinc module
+            results=bulk_logic(items,quantites,prices,usernames,int(quantity))
 
 
-        if sort=="Location":
-            buyer=current_user
-
-            for i in range(iter):
-                item=itemsfromitem[i]
-                quantity=quantitesfromquantity[i]
-
-                items=get_items(item)
-                usernames=get_item_sellers(items)
-                quantities=get_item_quantities(items)
-                
-                locationsinkm=[]
-                for i in items:
-                    converted=convert_to_km(buyer.latitude,buyer.longtitude,i.user.latitude,i.user.longtitude)
-                    locationsinkm.append(converted)
-                Sum=sum(quantities)
-                if int(quantity)>Sum:
-                    message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
-                    flash(message)
-                    return redirect(url_for('bulk_purchase'))
-                #getting items from miniinc module
-
-                results=bulk_by_location(locationsinkm,int(quantity),quantities)
-                selected=results["SelectedProduces"]
-                selected_items=get_selected_items(items,selected)
-                select=selected_selected(selected)
-                for i in selected_items:
-                    listofitems.append(i)
-                for i in select:
-                    listofselected.append(i)
-            iterations=len(listofitems)
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+            selected=results["SelectedProduces"]
+            users=get_users_selected(usernames,selected)
+            selected_items=get_selected_items(items,selected)
+            select=selected_selected(selected)
+            iterations=len(select)
+            return render_template('bulk_query.html',items=selected_items,select=select,iterations=iterations)
+            #bulk_logic(itemname,quantity)
+            #items=get_items(itemname)
+            #orders=bulk_logic(items)
+            return redirect(url_for('index'))
     
-    return render_template('bulk_purchase.html', form=form, items=litems)
+    return render_template('bulk_purchase.html', form=form, items=items)
 
 @app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
 def add_bulk_to_cart(itemid,selected):
@@ -795,4 +742,4 @@ def user_location(id):
 
 
 if __name__=="__main__":
-    app.run(host='0.0.0.0')
+    app.run(debug=True)
