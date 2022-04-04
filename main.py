@@ -16,7 +16,7 @@ from flask_login import UserMixin, login_user, login_manager, login_required, lo
 import os
 import requests
 import folium
-import string,random
+import string#,random
 
 
 app=Flask(__name__)
@@ -592,14 +592,14 @@ def get_cart():
     return render_template('cart.html',items=items,user=user,carts=cartitems,length=l)
 
 
-def  generate_order_code():
+"""def  generate_order_code():
     letters = string.ascii_lowercase
     digits=string.digits
     code=''.join(random.choice(letters) for i in range(5))
     numbers=''.join(random.choice(digits) for i in range(5))
     code=code+numbers
     new_code=''.join(random.sample(code, len(code)))
-    return new_code
+    return new_code"""
 
 @app.route("/test_code",methods=['GET'])
 def test_code():    
