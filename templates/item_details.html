@@ -3,7 +3,7 @@
 {% block content%}
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
 <div class="container">
-    <div class="product-content product-wrap clearfix product-deatil">
+    <div class="product-content product-wrap clearfix product-deatil" style="background-color: #2c6e49">
         <div class="row">
             <div class="col-md-5 col-sm-12 col-xs-12">
                 <div class="product-image">
@@ -13,7 +13,7 @@
                             <li data-target="#myCarousel-2" data-slide-to="1" class="active"></li>
                             <li data-target="#myCarousel-2" data-slide-to="2" class=""></li>
                         </ol>
-                        <div class="carousel-inner">
+                        <div class="carousel-inner" style="background-color: #fefee3">
                             <div class="item">
                                 <img src="/static/item_images/{{item.image}}" class="mx-auto img-thumbnail" alt="{{item.name}}" />
                             </div>
@@ -22,17 +22,17 @@
                 </div>
             </div>
 
-            <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12">
-                <h2 class="name">
+            <div class="col-md-6 col-md-offset-1 col-sm-12 col-xs-12" style="background-color: #2c6e49">
+                <h2 class="name" style="color:#2E282A ">
                     {{item.name}}
-                    <small>Product by <a href="/get_user_items/{{item.user.id}}">{{item.user.username}}</a></small>
+                    <small>Product by <a href="/get_user_items/{{item.user.id}}" style="color:white ">{{item.user.username}}</a></small>
                     <i class="fa fa-star fa-2x text-primary"></i>
                     <i class="fa fa-star fa-2x text-primary"></i>
                     <i class="fa fa-star fa-2x text-primary"></i>
                     <i class="fa fa-star fa-2x text-primary"></i>
                     <i class="fa fa-star fa-2x text-muted"></i>
                 </h2>
-                <hr />
+                <hr class="solid">
                 <h3 class="price-container">
                     ${{item.price}}
                     <small>per KG</small>
@@ -51,15 +51,17 @@
                         </li>
                     </ul>
                 </div>
-                <hr />
+                <hr class="solid">
 
                 <form class="form-inline"  method="POST" action="/add_to_cart/{{item.id}}">
                     <div class="form-group mx-sm-3 mb-2">
                       <label for="inputPassword2" class="sr-only">Quantity</label>
                       <input type="number" style="width: 300px;" min="1" max="{{item.quantity}}" class="form-control" id="quantity" name="quantity" placeholder="Quantity">
                     </div>
+                    </form>
+                </br>
                     <div style="margin-left: 20%;">
-                    <button type="submit" class="btn btn-primary mb-2">Add to Cart</button>
+                    <button type="submit" class="button-add-cart" style="background-color: #D68C45">Add to Cart</button>
                     </div>
                 </form>
                 </div>

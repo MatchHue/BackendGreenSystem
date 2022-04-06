@@ -5,6 +5,8 @@
 {{ super() }}
 
 {% block content %}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+
 {% for message in get_flashed_messages() %}
 
 <div class="alert alert-warning alert-dismissible show" role="alert">
@@ -30,25 +32,62 @@
       </div>
       {%endfor%}
 </div>-->
+<!--
+<div class="header", display="inline-block;", float="left;">
+    <div>
+        <div class="row-2">
+            <h1 class="index-title">Shopping Made Easier</h1>
+            <p class="index-p">Finding fresh produce is now easier and quicker than ever</p>
+        </div>
+        <div class="row-3">
+            <img src="/static/item_images/rezel-apacionado-MZfS19xrrz0-unsplash.jpg", style="width:500px;height:600px;">
+        </div>
+    </div>
+
+</div>
+-->
+</br>
+</br>
+<div class="row">
+    <div class="col" style="background-color:white; height:300px; padding-top: 90px;">
+        <div class="title text-center">
+            <h1 class="t text-center">Shopping Made Easier</h1>
+            <p class="title-p text-center">Finding fresh produce is now easier and quicker than ever</p>
+        </br>
+            <a href="/signup" class="button-sign" style="background-color: #D68C45">Sign up now!</a>
+        </div>
+    </div>
+    <div class="col text-center" style="background-color:white; height:500px;">
+            <img src="/static/item_images/rezel-apacionado-MZfS19xrrz0-unsplash.jpg" height= "500px;">
+    </div>
+</div>
+</br>
+
+
+
+<!--
 <div class="header" style="text-align: center; transform:translateX(38%);">
     <div class="new-container" style="align-items: flex-end;">
         <div class="row">
             <div class="col-2">
-                <h1>Shopping Made Easier</h1>
-                <p>Finding fresh produce is now easier and quicker than ever</p>
+                <h1 class="index-title">Shopping Made Easier</h1>
+                <p class="index-p">Finding fresh produce is now easier and quicker than ever</p>
             </div>
         </div>
     </div>
 </div>
+-->
+<hr class="solid">
+</br>
 <div class='container'>
     <div class="row">
     {% for item in items%}
     <div class="col">
-    <div class="card"> <img class='mx-auto img-thumbnail' src="/static/item_images/{{item.image}}" width="100%" height="100%" max-height="100px" max-midth="100px" />
+    <div class="card" style="background-color:#2c6e49;"> <img class='mx-auto img-thumbnail' src="/static/item_images/{{item.image}}" width="100%" height="100%" max-height="100px" max-midth="100px" />
         <div class="card-body text-center mx-auto">
             <div class='cvp'>
-                <h5 class="card-title font-weight-bold">{{item.name}}</h5>
-                <p class="card-text">${{item.price}} per kg</p> <p class="card-text">{{item.quantity}}kg Available</p><a href="/item_details/{{item.id}}" class="btn btn-primary btn-sm active">view details</a><br />
+                <h5 class="card-title font-weight-bold" style="color: white;">{{item.name}}</h5>
+                <p class="card-text" style="color: white;">${{item.price}} per kg</p> <p class="card-text" style="color: white;">{{item.quantity}}kg Available</p><a href="/item_details/{{item.id}}" class="btn bg-white text-dark btn-sm active">View Details</a><br />
             </div>
         </div>
     </div>
