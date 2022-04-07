@@ -57,11 +57,12 @@
 
 <br/>
 <div class="shadow p-3 mb-5 bg-white rounded">
+  <h1 style="text-align: center;">Query Up To 3 Items</h1>
 <form class="form-inline"  method="POST" action="/bulk_purchase">
   <div class="mb-3">
-    <label for="itemselect" class="form-label">Select Items</label>
     <div class="row g-3">
       <div class="col">
+        <label for="itemselect" class="form-label">Item 1</label>
     <select class="form-select" name="select1" aria-label="Default select example">
       <option selected>Select item</option>
       {%for item in items%}
@@ -70,6 +71,7 @@
     </select>
     </div>
     <div class="col">
+      <label for="itemselect" class="form-label">Quantity in kg</label>
       <input type="text" value="0"  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity1" id="quantities">
     </div>
   </div>
@@ -77,9 +79,9 @@
 
 
 <div class="mb-3">
-  <label for="itemselect" class="form-label">Select Items</label>
   <div class="row g-3">
     <div class="col">
+      <label for="itemselect" class="form-label">Item 2</label>
   <select class="form-select" name="select2" aria-label="Default select example">
     <option selected>Select item</option>
     {%for item in items%}
@@ -88,7 +90,8 @@
   </select>
   </div>
   <div class="col">
-    <input type="text" value="0"  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity2" id="quantities">
+    <label for="itemselect" class="form-label">Quantity in kg</label>
+    <input type="text" value="0 "  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity2" id="quantities">
   </div>
 </div>
 </div>
@@ -96,9 +99,9 @@
 
 
 <div class="mb-3">
-  <label for="itemselect" class="form-label">Select Items</label>
   <div class="row g-3">
     <div class="col">
+      <label for="itemselect" class="form-label">Item 3</label>
   <select class="form-select" name="select3" aria-label="Default select example">
     <option selected>Select item</option>
     {%for item in items%}
@@ -107,12 +110,15 @@
   </select>
   </div>
   <div class="col">
+    <label for="quantity3" class="form-label">Quantity in kg</label>
     <input type="text" value="0"  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity3" id="quantities">
   </div>
 </div>
 </div>
 
-<div><select  class="form-select" name="sort"aria-label="Default select example">
+<div>
+  <label for="quantity3" class="form-label">Query By</label>
+  <select style="width:100%;max-width:66.5%;" class="form-select" name="sort"aria-label="Default select example">
   <option value="Price">Price</option>
   <option value="Location">Location</option>
 </select></div>
