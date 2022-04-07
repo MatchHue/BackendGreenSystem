@@ -567,7 +567,28 @@ def search():
     data=request.args.get('searched')
     items=Item.query
     items=items.filter(Item.name.like('%' + data+'%'))
-    return render_template('search.html',items=items)
+    litems=[]
+    for item in items:
+        if item.quantity>0:
+            litems.append(item)
+    return render_template('search.html',items=litems,data=data)
+
+
+@app.route('/view_items_sellers_location/<item>',methods=["POST"])
+def view_items_sellers_location(item):
+    items=Item.query
+    items=items.filter(Item.name.like('%' + str(item)+'%'))
+    map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
+    for item in items:
+        folium.Marker([item.user.latitude,item.user.longtitude],popup=item.user.username,tooltip=item.user.username + "'s Location"
+
+        ).add_to(map)
+
+        folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip="Your location",icon=folium.Icon(color='red')
+
+        ).add_to(map)
+    
+    return map._repr_html_()
 
 @app.route('/sort_by_price',methods=['GET'])
 def sort_by_price():
@@ -803,8 +824,19 @@ def map():
 
     map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
     users=User.query.all()
+    newUsers=[]
     for user in users:
-        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location "
+        if len(user.items)>0:
+            newUsers.append(user)
+    for user in newUsers:
+        items=""
+        for item in user.items:
+            items=items + " " + item.name
+        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s " + "Items available" +str(items)
+
+        ).add_to(map)
+
+        folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip="Your location",icon=folium.Icon(color='red')
 
         ).add_to(map)
     
@@ -814,8 +846,11 @@ def map():
 @app.route('/user_location/<int:id>',methods=['GET'])
 def user_location(id):
     user=User.query.get(id)
+    items=""
+    for item in user.items:
+        items=items + " " + item.name
     map=folium.Map(location=[user.latitude,user.longtitude],tiles='Stamen Terrain',zoom_start=10)
-    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location ").add_to(map)
+    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s Items available ").add_to(map)
     return map._repr_html_()
 
 
