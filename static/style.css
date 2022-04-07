@@ -99,7 +99,9 @@ a {
 
 
   body {
-    background-color: #eee
+    background-color: #eee;
+    overflow-x: hidden;
+
 }
 
 .container {

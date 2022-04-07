@@ -1,4 +1,5 @@
 from ctypes import sizeof
+from enum import unique
 from gettext import lngettext
 import json
 from unicodedata import numeric
@@ -438,14 +439,37 @@ def bulk_by_location(sellerslocation,quantity,quantites):
 @login_required
 def bulk_purchase():
     items=Item.query.all()
+    unique=[]
+    for item in items:
+        if item.name not in unique:
+            unique.append(item.name)
     form=BulkForm()
     if request.method=="POST":
-        litems=request.form.getlist('items')
-        quantities=request.form["quantities"]
+        item1=request.form.get('select1')
+        quantity1=request.form.get('quantity1')
+        item2=request.form.get('select2')
+        quantity2=request.form.get('quantity2')
+        item3=request.form.get('select3')
+        quantity3=request.form.get('quantity3')
+        litems=[]
+        lquantities=[]
+
+        if item1!='Select item':
+            litems.append(item1)
+            lquantities.append(quantity1)
+        
+        if item2!='Select item':
+            litems.append(item2)
+            lquantities.append(quantity2)
+
+        if item3!='Select item':
+            litems.append(item3)
+            lquantities.append(quantity3)
+
         sort=request.form.get('sort')
         itemsfromitem=[]
         quantitesfromquantity=[]
-        quantitesfromquantity=quantities.split(',')
+        quantitesfromquantity=lquantities
         listofitems=[]
         listofselected=[]
         iterations=0
@@ -480,7 +504,12 @@ def bulk_purchase():
                 for i in select:
                     listofselected.append(i)
                 iterations=iterations+len(select)
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+
+            totalcost=0
+            for i in range(iterations):
+                totalcost=totalcost+listofitems[i].price*listofselected[i]
+
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
 
 
         if sort=="Location":
@@ -514,9 +543,14 @@ def bulk_purchase():
                 for i in select:
                     listofselected.append(i)
             iterations=len(listofitems)
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+
+            totalcost=0
+            for i in range(iterations):
+                totalcost=totalcost+listofitems[i].price*listofselected[i]
+
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
     
-    return render_template('bulk_purchase.html', form=form, items=items)
+    return render_template('bulk_purchase.html', form=form, items=unique)
 
 @app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
 def add_bulk_to_cart(itemid,selected):
@@ -524,17 +558,46 @@ def add_bulk_to_cart(itemid,selected):
     cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
     db.session.add(cartItem)
     db.session.commit()
-    flash("Item added to Cart")
-    return redirect(url_for('bulk_logic'))
+    return ('',204)
 
+import json
+@app.route('/add_all_bulk_to_cart',methods=['POST'])
+def add_all_bulk_to_cart():
+    data=request.get_json(force=True)
+    item=[]
+    for items in data:
+        item=items
+    return str(item)
 
+   
 
 @app.route('/search',methods=['GET'])
 def search():
     data=request.args.get('searched')
     items=Item.query
     items=items.filter(Item.name.like('%' + data+'%'))
-    return render_template('search.html',items=items)
+    litems=[]
+    for item in items:
+        if item.quantity>0:
+            litems.append(item)
+    return render_template('search.html',items=litems,data=data)
+
+
+@app.route('/view_items_sellers_location/<item>',methods=["POST"])
+def view_items_sellers_location(item):
+    items=Item.query
+    items=items.filter(Item.name.like('%' + str(item)+'%'))
+    map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
+    for item in items:
+        folium.Marker([item.user.latitude,item.user.longtitude],popup=item.user.username,tooltip=item.user.username + "'s Location"
+
+        ).add_to(map)
+
+        folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip="Your location",icon=folium.Icon(color='red')
+
+        ).add_to(map)
+    
+    return map._repr_html_()
 
 @app.route('/sort_by_price',methods=['GET'])
 def sort_by_price():
@@ -638,7 +701,10 @@ def get_cart():
         items.append(item)
         cartitems.append(cart)
     l=len(items)
-    return render_template('cart.html',items=items,user=user,carts=cartitems,length=l)
+    total=0
+    for i in range(l):
+        total=total+items[i].price * cartitems[i].cart_quantity
+    return render_template('cart.html',items=items,user=user,carts=cartitems,length=l,total=total)
 
 
 def  generate_order_code():
@@ -770,8 +836,19 @@ def map():
 
     map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
     users=User.query.all()
+    newUsers=[]
     for user in users:
-        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location "
+        if len(user.items)>0:
+            newUsers.append(user)
+    for user in newUsers:
+        items=""
+        for item in user.items:
+            items=items + " " + item.name
+        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s " + "Items available" +str(items)
+
+        ).add_to(map)
+
+        folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip="Your location",icon=folium.Icon(color='red')
 
         ).add_to(map)
     
@@ -781,8 +858,12 @@ def map():
 @app.route('/user_location/<int:id>',methods=['GET'])
 def user_location(id):
     user=User.query.get(id)
+    items=""
+    for item in user.items:
+        items=items + " " + item.name
     map=folium.Map(location=[user.latitude,user.longtitude],tiles='Stamen Terrain',zoom_start=10)
-    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s location ").add_to(map)
+    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s Location ").add_to(map)
+    folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip= "Your Location ",icon=folium.Icon(color='red')).add_to(map)
     return map._repr_html_()
 
 

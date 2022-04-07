@@ -48,7 +48,13 @@
             <div class='cvp'>
                 <h5 class="card-title font-weight-bold">{{items[i].name}}</h5>
                 <p class="card-text">From {{items[i].user.username}}</p>
-                <p class="card-text">${{items[i].price}} per kg</p> <p class="card-text">{{select[i]}}kg To Buy</p><a href="/add_bulk_to_cart/{{items[i].id}}/{{select[i]}}" class="btn btn-primary btn-sm active">Add Item to Cart</a><br /><br />
+                <p class="card-text">${{items[i].price}} per kg</p> <p class="card-text">{{select[i]}}kg To Buy</p>
+                <p class="card-text">Cost : $ {{items[i].price * select[i]}}</p>
+                <a href="/add_bulk_to_cart/{{items[i].id}}/{{select[i]}}" class="btn btn-primary btn-sm active">Add Item to Cart</a>
+                <br/>
+                <br/>
+                <a href="/user_location/{{items[i].user.id}}" class="btn btn-primary btn-sm active">View Location</a>
+                <br /><br />
             </div>
         </div>
     </div>
@@ -57,13 +63,29 @@
     {%endfor%}
     
 </div>
+
+<br/>
+<br/>
+<div class="shadow p-3 mb-5 bg-white rounded" style="align-items: center;">
+<p style="font-family:Arial, Helvetica, sans-serif; font-size: large; text-align: center;" >Total Cost of Items : ${{totalcost}}</p>
+<button onclick="postData()">Add All to Cart</button>
+</div>
+
 <br/>
 <div style="margin-left:40%;">
 </div>
 </div>
 <hr/>
 
+<script>
 
-
-
+    function postData(){
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", '/add_all_bulk_to_cart', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    dataSend='{{items}}';
+    xhr.send(dataSend);
+   
+}
+</script>
 {% endblock %}
