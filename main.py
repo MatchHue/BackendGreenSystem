@@ -701,7 +701,10 @@ def get_cart():
         items.append(item)
         cartitems.append(cart)
     l=len(items)
-    return render_template('cart.html',items=items,user=user,carts=cartitems,length=l)
+    total=0
+    for i in range(l):
+        total=total+items[i].price * cartitems[i].cart_quantity
+    return render_template('cart.html',items=items,user=user,carts=cartitems,length=l,total=total)
 
 
 def  generate_order_code():

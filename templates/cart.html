@@ -25,6 +25,9 @@
               <td>{{ items[i].price }}</td>
           </tr>
           {%endfor%}
+          <tr>
+            <td>Total = ${{total}}</td>
+          </tr>
       </tbody>
     </table>
     <a href="/checkout/{{user.id}}" class="btn btn-primary btn-sm active">Checkout</a>
