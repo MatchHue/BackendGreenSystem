@@ -560,7 +560,16 @@ def add_bulk_to_cart(itemid,selected):
     db.session.commit()
     return ('',204)
 
+import json
+@app.route('/add_all_bulk_to_cart',methods=['POST'])
+def add_all_bulk_to_cart():
+    data=request.get_json(force=True)
+    item=[]
+    for items in data:
+        item=items
+    return str(item)
 
+   
 
 @app.route('/search',methods=['GET'])
 def search():
@@ -850,7 +859,8 @@ def user_location(id):
     for item in user.items:
         items=items + " " + item.name
     map=folium.Map(location=[user.latitude,user.longtitude],tiles='Stamen Terrain',zoom_start=10)
-    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s Items available ").add_to(map)
+    folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s Location ").add_to(map)
+    folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip= "Your Location ",icon=folium.Icon(color='red')).add_to(map)
     return map._repr_html_()
 
 
