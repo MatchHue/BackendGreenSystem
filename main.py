@@ -1,4 +1,5 @@
 from ctypes import sizeof
+from enum import unique
 from gettext import lngettext
 import json
 from unicodedata import numeric
@@ -434,10 +435,15 @@ def bulk_by_location(sellerslocation,quantity,quantites):
     # Output the results
     return result    
 
+import re
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
 def bulk_purchase():
     items=Item.query.all()
+    unique=[]
+    for item in items:
+        if item.name not in unique:
+            unique.append(item.name)
     form=BulkForm()
     if request.method=="POST":
         litems=request.form.getlist('items')
@@ -516,7 +522,7 @@ def bulk_purchase():
             iterations=len(listofitems)
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
     
-    return render_template('bulk_purchase.html', form=form, items=items)
+    return render_template('bulk_purchase.html', form=form, items=unique)
 
 @app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
 def add_bulk_to_cart(itemid,selected):

@@ -53,8 +53,6 @@
 
 
 
-
-
 <h2>Bulk Purchase</h2>
 
 <br/>
@@ -62,18 +60,59 @@
 <form class="form-inline"  method="POST" action="/bulk_purchase">
   <div class="mb-3">
     <label for="itemselect" class="form-label">Select Items</label>
-  <select id="itemselect" class="form-select" name="items"  multiple data-max-options="2" aria-label="multiple select example">
-  {%for item in items%}
-  <option value="{{item.name}}">{{item.name}}</option>
-  {%endfor%}
-</select>
-</div>
-<div class="mb-3">
-  <label for="quantity" class="form-label">Enter The Quantities</label>
-  <input type="text" class="form-control" name="quantities" id="quantities">
+    <div class="row g-3">
+      <div class="col">
+    <select class="form-select" name="select1" aria-label="Default select example">
+      <option selected>Select item</option>
+      {%for item in items%}
+      <option value="{{item}}">{{item}}</option>
+      {%endfor%}
+    </select>
+    </div>
+    <div class="col">
+      <input type="text" value="0"  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity1" id="quantities">
+    </div>
+  </div>
 </div>
 
-<div><select class="form-select" name="sort"aria-label="Default select example">
+
+<div class="mb-3">
+  <label for="itemselect" class="form-label">Select Items</label>
+  <div class="row g-3">
+    <div class="col">
+  <select class="form-select" name="select2" aria-label="Default select example">
+    <option selected>Select item</option>
+    {%for item in items%}
+    <option value="{{item}}">{{item}}</option>
+    {%endfor%}
+  </select>
+  </div>
+  <div class="col">
+    <input type="text" value="0"  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity2" id="quantities">
+  </div>
+</div>
+</div>
+
+
+
+<div class="mb-3">
+  <label for="itemselect" class="form-label">Select Items</label>
+  <div class="row g-3">
+    <div class="col">
+  <select class="form-select" name="select3" aria-label="Default select example">
+    <option selected>Select item</option>
+    {%for item in items%}
+    <option value="{{item}}">{{ item}}</option>
+    {%endfor%}
+  </select>
+  </div>
+  <div class="col">
+    <input type="text" value="0"  style="width: 200px;" class="form-control" placeholder="Item Quantity" name="quantity3" id="quantities">
+  </div>
+</div>
+</div>
+
+<div><select  class="form-select" name="sort"aria-label="Default select example">
   <option value="Price">Price</option>
   <option value="Location">Location</option>
 </select></div>
