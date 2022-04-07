@@ -48,7 +48,9 @@
             <div class='cvp'>
                 <h5 class="card-title font-weight-bold">{{items[i].name}}</h5>
                 <p class="card-text">From {{items[i].user.username}}</p>
-                <p class="card-text">${{items[i].price}} per kg</p> <p class="card-text">{{select[i]}}kg To Buy</p><a href="/add_bulk_to_cart/{{items[i].id}}/{{select[i]}}" class="btn btn-primary btn-sm active">Add Item to Cart</a><br /><br />
+                <p class="card-text">${{items[i].price}} per kg</p> <p class="card-text">{{select[i]}}kg To Buy</p>
+                <p class="card-text">Cost : $ {{items[i].price * select[i]}}</p>
+                <a href="/add_bulk_to_cart/{{items[i].id}}/{{select[i]}}" class="btn btn-primary btn-sm active">Add Item to Cart</a><br /><br />
             </div>
         </div>
     </div>

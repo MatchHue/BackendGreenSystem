@@ -49,6 +49,7 @@
         <div class="card-body text-center mx-auto">
             <div class='cvp'>
                 <h5 class="card-title font-weight-bold">{{item.name}}</h5>
+                <p>Seller : {{item.user.username}}</p>
                 <p class="card-text">${{item.price}} per kg</p> <p class="card-text">{{item.quantity}}kg Available</p><a href="/item_details/{{item.id}}" class="btn btn-primary btn-sm active">view details</a><br />
             </div>
         </div>
