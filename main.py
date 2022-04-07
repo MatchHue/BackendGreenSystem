@@ -435,7 +435,6 @@ def bulk_by_location(sellerslocation,quantity,quantites):
     # Output the results
     return result    
 
-import re
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
 def bulk_purchase():
@@ -559,8 +558,7 @@ def add_bulk_to_cart(itemid,selected):
     cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
     db.session.add(cartItem)
     db.session.commit()
-    flash("Item added to Cart")
-    return redirect(url_for('bulk_logic'))
+    return ('',204)
 
 
 
