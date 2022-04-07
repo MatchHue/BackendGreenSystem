@@ -446,12 +446,31 @@ def bulk_purchase():
             unique.append(item.name)
     form=BulkForm()
     if request.method=="POST":
-        litems=request.form.getlist('items')
-        quantities=request.form["quantities"]
+        item1=request.form.get('select1')
+        quantity1=request.form.get('quantity1')
+        item2=request.form.get('select2')
+        quantity2=request.form.get('quantity2')
+        item3=request.form.get('select3')
+        quantity3=request.form.get('quantity3')
+        litems=[]
+        lquantities=[]
+
+        if item1!='Select item':
+            litems.append(item1)
+            lquantities.append(quantity1)
+        
+        if item2!='Select item':
+            litems.append(item2)
+            lquantities.append(quantity2)
+
+        if item3!='Select item':
+            litems.append(item3)
+            lquantities.append(quantity3)
+
         sort=request.form.get('sort')
         itemsfromitem=[]
         quantitesfromquantity=[]
-        quantitesfromquantity=quantities.split(',')
+        quantitesfromquantity=lquantities
         listofitems=[]
         listofselected=[]
         iterations=0
@@ -486,7 +505,12 @@ def bulk_purchase():
                 for i in select:
                     listofselected.append(i)
                 iterations=iterations+len(select)
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+
+            totalcost=0
+            for i in range(iterations):
+                totalcost=totalcost+listofitems[i].price*listofselected[i]
+
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
 
 
         if sort=="Location":
@@ -520,7 +544,12 @@ def bulk_purchase():
                 for i in select:
                     listofselected.append(i)
             iterations=len(listofitems)
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations)
+
+            totalcost=0
+            for i in range(iterations):
+                totalcost=totalcost+listofitems[i].price*listofselected[i]
+
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
     
     return render_template('bulk_purchase.html', form=form, items=unique)
 
