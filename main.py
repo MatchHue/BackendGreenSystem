@@ -162,6 +162,13 @@ def getlocation():
     data=response.json()
     return data
 
+def deletebulk():
+    bulks=Bulk.query.filter_by(user_id=current_user.id).all()
+    for bulk in bulks:
+        db.session.delete(bulk)
+    db.session.commit()
+    return
+
 @app.route('/',methods=['GET'])
 def index():
     users=User.query.all()
@@ -553,27 +560,44 @@ def bulk_purchase():
             totalcost=0
             for i in range(iterations):
                 totalcost=totalcost+listofitems[i].price*listofselected[i]
-
+            
+            for i in range(iterations):
+                new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
+                db.session.add(new_bulk)
+            db.session.commit()
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
     
     return render_template('bulk_purchase.html', form=form, items=unique)
 
-@app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
-def add_bulk_to_cart(itemid,selected):
+@app.route("/add_bulk_to_cart/<int:id>",methods=["GET"])
+@login_required
+def add_bulk_to_cart(id):
     user=current_user.id
-    cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
-    db.session.add(cartItem)
+    bulks=Bulk.query.filter_by(user_id=id).all()
+    for bulk in bulks:
+        item=Item.query.get(bulk.item_id)
+        cartItem=Cart(item_id=item.id,cart_quantity=bulk.quantity_bought,user_id=user)
+        db.session.add(cartItem)
     db.session.commit()
-    return ('',204)
+    return redirect(url_for('bulk_purchase'))
 
 @app.route("/view_bulk_locations/<int:id>",methods=['GET'])
+@login_required
 def view_bulk_locations(id):
     bulks=Bulk.query.filter_by(user_id=id).all()
     users=[]
+    map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
     for bulk in bulks:
-        user=User.query.get(bulk.user_id)
-        users.append(user.username)
-    return jsonify(users)
+        item=Item.query.get(bulk.item_id)
+        folium.Marker([item.user.latitude,item.user.longtitude],popup=item.user.username,tooltip=item.user.username + "'s Location"
+
+        ).add_to(map)
+
+        folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip="Your location",icon=folium.Icon(color='red')
+
+        ).add_to(map)
+    
+    return map._repr_html_()
 
 import json
 @app.route('/add_all_bulk_to_cart',methods=['POST'])
@@ -706,6 +730,7 @@ def add_to_cart(id):
 @app.route('/get_cart',methods=['GET'])
 @login_required
 def get_cart():
+    deletebulk()
     user=User.query.get(current_user.id)
     items=[]
     cartitems=[]
