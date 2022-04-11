@@ -153,6 +153,8 @@ class Order(db.Model):
 
 class Bulk(db.Model):
     bulk_id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer,nullable=False)
+    item_id=db.Column(db.Integer,nullable=False)
     quantity_bought=db.Column(db.Integer,nullable=False)
 
 def getlocation():
@@ -508,7 +510,11 @@ def bulk_purchase():
             totalcost=0
             for i in range(iterations):
                 totalcost=totalcost+listofitems[i].price*listofselected[i]
-
+            
+            for i in range(iterations):
+                new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
+                db.session.add(new_bulk)
+            db.session.commit()
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
 
 
@@ -559,6 +565,15 @@ def add_bulk_to_cart(itemid,selected):
     db.session.add(cartItem)
     db.session.commit()
     return ('',204)
+
+@app.route("/view_bulk_locations/<int:id>",methods=['GET'])
+def view_bulk_locations(id):
+    bulks=Bulk.query.filter_by(user_id=id).all()
+    users=[]
+    for bulk in bulks:
+        user=User.query.get(bulk.user_id)
+        users.append(user.username)
+    return jsonify(users)
 
 import json
 @app.route('/add_all_bulk_to_cart',methods=['POST'])
