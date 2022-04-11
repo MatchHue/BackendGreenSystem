@@ -859,7 +859,7 @@ def map():
         items=""
         for item in user.items:
             items=items + " " + item.name
-        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s " + "Items available" +str(items)
+        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s Location"
 
         ).add_to(map)
 
