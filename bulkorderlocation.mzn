@@ -32,7 +32,7 @@ constraint sumItems <= totalProducts;
 constraint forall(i in 1..n)( SelectedProduces[i] <= ProduceQuantity[i]);
 
 var float: choosenlocation;
-choosenlocation = sum(j in 1..n)(SelectedProduces[j]*DistanceBetween[j]);
+choosenlocation = sum(j in 1..n)(SelectedProduces[j]*DisAtanceBetween[j]);
 
 solve minimize choosenlocation;
 

@@ -425,7 +425,7 @@ def convert_to_km(lat1,lon1,lat2,lon2):
     c=2*math.atan2(math.sqrt(a),math.sqrt(1-a))
 
     #distance between both users in km
-    d=R*c
+    d=abs(R*c)
     return d
 
 def bulk_by_location(sellerslocation,quantity,quantites):
