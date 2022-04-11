@@ -567,6 +567,63 @@ def bulk_purchase():
             db.session.commit()
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
     
+
+        if sort=="Location or Price":
+            buyer=current_user
+
+            for i in range(iter):
+                Litem=itemsfromitem[i]
+                Lquantity=quantitesfromquantity[i]
+
+                Litems=get_items(Litem)
+                Lusernames=get_item_sellers(Litems)
+                Lquantities=get_item_quantities(Litems)
+                prices=get_items_prices(Litems)
+                
+                locationsinkm=[]
+                for i in Litems:
+                    converted=convert_to_km(buyer.latitude,buyer.longtitude,i.user.latitude,i.user.longtitude)
+                    locationsinkm.append(converted)
+                LSum=sum(Lquantities)
+                if int(Lquantity)>LSum:
+                    message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                    flash(message)
+                    return redirect(url_for('bulk_purchase'))
+                #getting items from miniinc module
+
+                Lresults=bulk_by_location(locationsinkm,int(Lquantity),Lquantities)
+                Lselected=Lresults["SelectedProduces"]
+                Lselected_items=get_selected_items(Litems,Lselected)
+                Lselect=selected_selected(Lselected)
+
+                Presults=bulk_logic(Litems,Lquantities,prices,Lusernames,int(Lquantity))
+
+                Pselected=Presults["SelectedProduces"]
+                users=get_users_selected(Lusernames,Pselected)
+                Pselected_items=get_selected_items(Litems,Pselected)
+                select=selected_selected(Pselected)
+
+                for i in range(iterations):
+                    opt1=Lselected_items[i]
+                    opt2=Pselected_items[i]
+
+
+                for i in Lselected_items:
+                    listofitems.append(i)
+                for i in Lselect:
+                    listofselected.append(i)
+            iterations=len(listofitems)
+
+            totalcost=0
+            for i in range(iterations):
+                totalcost=totalcost+listofitems[i].price*listofselected[i]
+            
+            for i in range(iterations):
+                new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
+                db.session.add(new_bulk)
+            db.session.commit()
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
+
     return render_template('bulk_purchase.html', form=form, items=unique)
 
 @app.route("/add_bulk_to_cart/<int:id>",methods=["GET"])
