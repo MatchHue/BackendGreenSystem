@@ -12,6 +12,8 @@ array[1..n] of float: Prices;
 
 int:quantity;
 
+float: maxdistance;
+float: maxprice;
 var int:sumItems;
 var int:totalProducts;
 
@@ -36,8 +38,11 @@ constraint forall(i in 1..n)( SelectedProduces[i] <= ProduceQuantity[i]);
 var float: choosenlocation;
 var float :byprice=sum(j in 1..n)(SelectedProduces[j]*Prices[j]);
 var float :byDistance=sum(j in 1..n)(SelectedProduces[j]*DistanceBetween[j]);
-constraint
-choosenlocation =if byprice>=byDistance then byprice else byDistance endif;
+
+
+%constraint
+%choosenlocation =if byprice<=byDistance then byprice else byDistance endif;
+choosenlocation=0.6*byprice+0.4*byDistance;
 
 
 solve minimize choosenlocation;

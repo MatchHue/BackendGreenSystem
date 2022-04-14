@@ -633,6 +633,8 @@ def bulk_purchase():
 
     return render_template('bulk_purchase.html', form=form, items=unique)
 
+
+
 @app.route("/add_bulk_to_cart/<int:id>",methods=["GET"])
 @login_required
 def add_bulk_to_cart(id):
