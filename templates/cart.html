@@ -7,10 +7,14 @@
 {{ super() }}
 
 {% block content %}
-<h2>{{user.username}}'s Cart</h2>
-<div class="col-8">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+<div class="cart-name">
+  <h2>{{user.username}}'s Cart</h2>
+</div>
+
+<div class="cart">
     <table class="table table-hover table dark">
-      <thead>
+      <thead class="cart-head">
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Quantity</th>
@@ -18,8 +22,8 @@
           <th scope="col">Action</th>
         </tr>
       </thead>
-      <tbody>
-            {%for i in range(length)%}
+      <tbody class="cart-body">
+            {%for item in items%}
           <tr>
               <td>{{ items[i].name }}</td>
               <td>{{ carts[i].cart_quantity}}</td>
@@ -27,22 +31,12 @@
               <td><a href="/delete_cart_item/{{carts[i].cart_id}}" class="btn btn_secondary bt-sm active">Remove Item</a></td>
           </tr>
           {%endfor%}
-          <tr>
-            <td>Total = ${{total}}</td>
-          </tr>
       </tbody>
     </table>
-    <a href="/checkout/{{user.id}}" class="btn btn-primary btn-sm active">Checkout</a>
+    <div class="col-sm">
+        <a href="/checkout/{{user.id}}" class="button-checkout" >Checkout</a>
+    </div>
   </div>
 
-<!--
-<p>{{user.username}}'s Cart</p>
-{%for item in items%}
 
-
-<p>{{item.name}}</p>
-<p>{{item.price}}</p>
-<p>{{item.cart_quantity}}</p>
-{%endfor%}
--->
 {%endblock%}
