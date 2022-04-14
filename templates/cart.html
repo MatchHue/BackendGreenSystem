@@ -15,6 +15,7 @@
           <th scope="col">Name</th>
           <th scope="col">Quantity</th>
           <th scope="col">Price</th>
+          <th scope="col">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -23,6 +24,7 @@
               <td>{{ items[i].name }}</td>
               <td>{{ carts[i].cart_quantity}}</td>
               <td>{{ items[i].price }}</td>
+              <td><a href="/delete_cart_item/{{carts[i].cart_id}}" class="btn btn_secondary bt-sm active">Remove Item</a></td>
           </tr>
           {%endfor%}
           <tr>

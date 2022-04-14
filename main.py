@@ -782,6 +782,13 @@ def add_to_cart(id):
     return redirect(url_for('index'))
 
 
+@app.route('/delete_cart_item/<int:id>',methods=['GET'])
+@login_required
+def delete_cart_item(id):
+    cart=Cart.query.get(id)
+    db.session.delete(cart)
+    db.session.commit()
+    return redirect(url_for('get_cart'))
 
 
 @app.route('/get_cart',methods=['GET'])
