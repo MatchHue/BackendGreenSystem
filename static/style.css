@@ -41,14 +41,12 @@ a {
     background: #a6f77b;
     border-radius: 8px;
     box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.65);
-    height: 10px;
     margin: 6rem auto 8.1rem auto;
     width: 329px;
 
   }
   #card-content {
     padding: 12px 44px;
-    height: 50px;
   }
   #card-title {
     font-family: "Raleway Thin", sans-serif;
