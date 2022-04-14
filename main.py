@@ -400,10 +400,14 @@ def bulk_logic(items,quantites,prices,usernames,quantity):
     return result
 
 
-def get_items(item_name):
+def get_items(item_name,user):
     items=Item.query
     items=items.filter(Item.name.like('%' + item_name+'%'))
-    return items
+    new_items=[]
+    for item in items:
+        if item.user.username!=user:
+            new_items.append(item)
+    return new_items
 
 
 
@@ -443,6 +447,22 @@ def bulk_by_location(sellerslocation,quantity,quantites):
     result = instance.solve()
     # Output the results
     return result    
+
+def bulk_by_location_or_price(sellers,quantity,quantites,prices):
+    bulkorder=Model("./multipurposetest.mzn")
+    # Find the MiniZinc solver configuration for coin-bc
+    gecode = Solver.lookup("coin-bc")
+    # Create an Instance of the Bulk_purchase model for coin-bc
+    instance = Instance(gecode, bulkorder)
+    # Assign 4 to n
+    instance["n"] = len(quantites)
+    instance["ProduceQuantity"]=quantites
+    instance["DistanceBetween"]=sellers
+    instance["Prices"]=prices
+    instance["quantity"]=quantity
+    result = instance.solve()
+    # Output the results
+    return result 
 
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
@@ -492,7 +512,7 @@ def bulk_purchase():
                 item=itemsfromitem[i]
                 quantity=quantitesfromquantity[i]
                 
-                items=get_items(item)
+                items=get_items(item,current_user.username)
                 usernames=get_item_sellers(items)
                 quantites=get_item_quantities(items)
                 prices=get_items_prices(items)
@@ -532,7 +552,7 @@ def bulk_purchase():
                 item=itemsfromitem[i]
                 quantity=quantitesfromquantity[i]
 
-                items=get_items(item)
+                items=get_items(item,current_user.username)
                 usernames=get_item_sellers(items)
                 quantities=get_item_quantities(items)
                 
@@ -570,47 +590,33 @@ def bulk_purchase():
 
         if sort=="Location or Price":
             buyer=current_user
-
             for i in range(iter):
-                Litem=itemsfromitem[i]
-                Lquantity=quantitesfromquantity[i]
+                item=itemsfromitem[i]
+                quantity=quantitesfromquantity[i]
 
-                Litems=get_items(Litem)
-                Lusernames=get_item_sellers(Litems)
-                Lquantities=get_item_quantities(Litems)
-                prices=get_items_prices(Litems)
+                items=get_items(item,current_user.username)
+                usernames=get_item_sellers(items)
+                quantities=get_item_quantities(items)
+                prices=get_items_prices(items)
                 
                 locationsinkm=[]
-                for i in Litems:
+                for i in items:
                     converted=convert_to_km(buyer.latitude,buyer.longtitude,i.user.latitude,i.user.longtitude)
                     locationsinkm.append(converted)
-                LSum=sum(Lquantities)
-                if int(Lquantity)>LSum:
+                Sum=sum(quantities)
+                if int(quantity)>Sum:
                     message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
                     flash(message)
                     return redirect(url_for('bulk_purchase'))
                 #getting items from miniinc module
 
-                Lresults=bulk_by_location(locationsinkm,int(Lquantity),Lquantities)
-                Lselected=Lresults["SelectedProduces"]
-                Lselected_items=get_selected_items(Litems,Lselected)
-                Lselect=selected_selected(Lselected)
-
-                Presults=bulk_logic(Litems,Lquantities,prices,Lusernames,int(Lquantity))
-
-                Pselected=Presults["SelectedProduces"]
-                users=get_users_selected(Lusernames,Pselected)
-                Pselected_items=get_selected_items(Litems,Pselected)
-                select=selected_selected(Pselected)
-
-                for i in range(iterations):
-                    opt1=Lselected_items[i]
-                    opt2=Pselected_items[i]
-
-
-                for i in Lselected_items:
+                results=bulk_by_location_or_price(locationsinkm,int(quantity),quantities,prices)
+                selected=results["SelectedProduces"]
+                selected_items=get_selected_items(items,selected)
+                select=selected_selected(selected)
+                for i in selected_items:
                     listofitems.append(i)
-                for i in Lselect:
+                for i in select:
                     listofselected.append(i)
             iterations=len(listofitems)
 
@@ -622,6 +628,7 @@ def bulk_purchase():
                 new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
                 db.session.add(new_bulk)
             db.session.commit()
+            
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
 
     return render_template('bulk_purchase.html', form=form, items=unique)
@@ -859,6 +866,16 @@ def get_orders():
     sl=len(seller_items)
     return render_template('orders_list.html',buyer=buyer,bl=bl,sl=sl,
     sellers_orders=sellers_orders,buyers_orders=buyers_orders,seller_items=seller_items,buyer_items=buyer_items)
+
+@app.route("/delete_order/<int:id>",methods=['GET'])
+@login_required
+def delete_order(id):
+    order=Order.query.get(id)
+    item=Item.query.get(order.item_bought)
+    item.quantity=item.quantity+order.quantity_bought
+    db.session.delete(order)
+    db.session.commit()
+    return redirect(url_for('get_orders'))
 
 @app.route("/checkout/<int:id>",methods=['GET'])
 @login_required
