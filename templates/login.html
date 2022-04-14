@@ -18,13 +18,13 @@
 
     {%endfor%}
 
-
 <div id="card">
     <div id="card-content">
       <div id="card-title">
         <h2>LOGIN</h2>
         <div class="underline-title"></div>
       </div>
+      <div class="shadow p-3 mb-5 bg-white rounded">
       <form method='POST' class="form">
         {{form.hidden_tag()}}
         <br/>
@@ -46,6 +46,7 @@
       </form>
     </div>
   </div>
+</div>
 
 
 {% endblock %}
