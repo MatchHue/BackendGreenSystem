@@ -153,12 +153,21 @@ class Order(db.Model):
 
 class Bulk(db.Model):
     bulk_id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer,nullable=False)
+    item_id=db.Column(db.Integer,nullable=False)
     quantity_bought=db.Column(db.Integer,nullable=False)
 
 def getlocation():
     response=requests.get("http://ip-api.com/json/")
     data=response.json()
     return data
+
+def deletebulk():
+    bulks=Bulk.query.filter_by(user_id=current_user.id).all()
+    for bulk in bulks:
+        db.session.delete(bulk)
+    db.session.commit()
+    return
 
 @app.route('/',methods=['GET'])
 def index():
@@ -391,10 +400,14 @@ def bulk_logic(items,quantites,prices,usernames,quantity):
     return result
 
 
-def get_items(item_name):
+def get_items(item_name,user):
     items=Item.query
     items=items.filter(Item.name.like('%' + item_name+'%'))
-    return items
+    new_items=[]
+    for item in items:
+        if item.user.username!=user:
+            new_items.append(item)
+    return new_items
 
 
 
@@ -416,7 +429,7 @@ def convert_to_km(lat1,lon1,lat2,lon2):
     c=2*math.atan2(math.sqrt(a),math.sqrt(1-a))
 
     #distance between both users in km
-    d=R*c
+    d=abs(R*c)
     return d
 
 def bulk_by_location(sellerslocation,quantity,quantites):
@@ -434,6 +447,22 @@ def bulk_by_location(sellerslocation,quantity,quantites):
     result = instance.solve()
     # Output the results
     return result    
+
+def bulk_by_location_or_price(sellers,quantity,quantites,prices):
+    bulkorder=Model("./multipurposetest.mzn")
+    # Find the MiniZinc solver configuration for coin-bc
+    gecode = Solver.lookup("coin-bc")
+    # Create an Instance of the Bulk_purchase model for coin-bc
+    instance = Instance(gecode, bulkorder)
+    # Assign 4 to n
+    instance["n"] = len(quantites)
+    instance["ProduceQuantity"]=quantites
+    instance["DistanceBetween"]=sellers
+    instance["Prices"]=prices
+    instance["quantity"]=quantity
+    result = instance.solve()
+    # Output the results
+    return result 
 
 @app.route('/bulk_purchase',methods=['GET','POST'])
 @login_required
@@ -483,7 +512,7 @@ def bulk_purchase():
                 item=itemsfromitem[i]
                 quantity=quantitesfromquantity[i]
                 
-                items=get_items(item)
+                items=get_items(item,current_user.username)
                 usernames=get_item_sellers(items)
                 quantites=get_item_quantities(items)
                 prices=get_items_prices(items)
@@ -508,7 +537,11 @@ def bulk_purchase():
             totalcost=0
             for i in range(iterations):
                 totalcost=totalcost+listofitems[i].price*listofselected[i]
-
+            
+            for i in range(iterations):
+                new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
+                db.session.add(new_bulk)
+            db.session.commit()
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
 
 
@@ -519,7 +552,7 @@ def bulk_purchase():
                 item=itemsfromitem[i]
                 quantity=quantitesfromquantity[i]
 
-                items=get_items(item)
+                items=get_items(item,current_user.username)
                 usernames=get_item_sellers(items)
                 quantities=get_item_quantities(items)
                 
@@ -547,18 +580,88 @@ def bulk_purchase():
             totalcost=0
             for i in range(iterations):
                 totalcost=totalcost+listofitems[i].price*listofselected[i]
-
+            
+            for i in range(iterations):
+                new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
+                db.session.add(new_bulk)
+            db.session.commit()
             return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
     
+
+        if sort=="Location or Price":
+            buyer=current_user
+            for i in range(iter):
+                item=itemsfromitem[i]
+                quantity=quantitesfromquantity[i]
+
+                items=get_items(item,current_user.username)
+                usernames=get_item_sellers(items)
+                quantities=get_item_quantities(items)
+                prices=get_items_prices(items)
+                
+                locationsinkm=[]
+                for i in items:
+                    converted=convert_to_km(buyer.latitude,buyer.longtitude,i.user.latitude,i.user.longtitude)
+                    locationsinkm.append(converted)
+                Sum=sum(quantities)
+                if int(quantity)>Sum:
+                    message="Error cannot query order as given quantity of "+ item +" is greater than the quantity avaiable. Available quantity: " + str(Sum) + "kg"
+                    flash(message)
+                    return redirect(url_for('bulk_purchase'))
+                #getting items from miniinc module
+
+                results=bulk_by_location_or_price(locationsinkm,int(quantity),quantities,prices)
+                selected=results["SelectedProduces"]
+                selected_items=get_selected_items(items,selected)
+                select=selected_selected(selected)
+                for i in selected_items:
+                    listofitems.append(i)
+                for i in select:
+                    listofselected.append(i)
+            iterations=len(listofitems)
+
+            totalcost=0
+            for i in range(iterations):
+                totalcost=totalcost+listofitems[i].price*listofselected[i]
+            
+            for i in range(iterations):
+                new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
+                db.session.add(new_bulk)
+            db.session.commit()
+            
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
+
     return render_template('bulk_purchase.html', form=form, items=unique)
 
-@app.route("/add_bulk_to_cart/<int:itemid>/<int:selected>",methods=["GET"])
-def add_bulk_to_cart(itemid,selected):
+@app.route("/add_bulk_to_cart/<int:id>",methods=["GET"])
+@login_required
+def add_bulk_to_cart(id):
     user=current_user.id
-    cartItem=Cart(item_id=itemid,cart_quantity=selected,user_id=user)
-    db.session.add(cartItem)
+    bulks=Bulk.query.filter_by(user_id=id).all()
+    for bulk in bulks:
+        item=Item.query.get(bulk.item_id)
+        cartItem=Cart(item_id=item.id,cart_quantity=bulk.quantity_bought,user_id=user)
+        db.session.add(cartItem)
     db.session.commit()
-    return ('',204)
+    return redirect(url_for('bulk_purchase'))
+
+@app.route("/view_bulk_locations/<int:id>",methods=['GET'])
+@login_required
+def view_bulk_locations(id):
+    bulks=Bulk.query.filter_by(user_id=id).all()
+    users=[]
+    map=folium.Map(location=[10.3144,-61.4087],tiles='Stamen Terrain',zoom_start=10)
+    for bulk in bulks:
+        item=Item.query.get(bulk.item_id)
+        folium.Marker([item.user.latitude,item.user.longtitude],popup=item.user.username,tooltip=item.user.username + "'s Location"
+
+        ).add_to(map)
+
+        folium.Marker([current_user.latitude,current_user.longtitude],popup=current_user.username,tooltip="Your location",icon=folium.Icon(color='red')
+
+        ).add_to(map)
+    
+    return map._repr_html_()
 
 import json
 @app.route('/add_all_bulk_to_cart',methods=['POST'])
@@ -686,11 +789,19 @@ def add_to_cart(id):
     return redirect(url_for('index'))
 
 
+@app.route('/delete_cart_item/<int:id>',methods=['GET'])
+@login_required
+def delete_cart_item(id):
+    cart=Cart.query.get(id)
+    db.session.delete(cart)
+    db.session.commit()
+    return redirect(url_for('get_cart'))
 
 
 @app.route('/get_cart',methods=['GET'])
 @login_required
 def get_cart():
+    deletebulk()
     user=User.query.get(current_user.id)
     items=[]
     cartitems=[]
@@ -755,6 +866,16 @@ def get_orders():
     sl=len(seller_items)
     return render_template('orders_list.html',buyer=buyer,bl=bl,sl=sl,
     sellers_orders=sellers_orders,buyers_orders=buyers_orders,seller_items=seller_items,buyer_items=buyer_items)
+
+@app.route("/delete_order/<int:id>",methods=['GET'])
+@login_required
+def delete_order(id):
+    order=Order.query.get(id)
+    item=Item.query.get(order.item_bought)
+    item.quantity=item.quantity+order.quantity_bought
+    db.session.delete(order)
+    db.session.commit()
+    return redirect(url_for('get_orders'))
 
 @app.route("/checkout/<int:id>",methods=['GET'])
 @login_required
@@ -844,7 +965,7 @@ def map():
         items=""
         for item in user.items:
             items=items + " " + item.name
-        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s " + "Items available" +str(items)
+        folium.Marker([user.latitude,user.longtitude],popup=user.username,tooltip=user.username + "'s Location"
 
         ).add_to(map)
 

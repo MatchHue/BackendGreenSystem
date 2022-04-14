@@ -8,6 +8,7 @@ int:n;
 
 array[1..n] of int: ProduceQuantity;
 array[1..n] of float: DistanceBetween;
+array[1..n] of float: Prices;
 
 int:quantity;
 
@@ -30,9 +31,14 @@ constraint sumItems >= quantity;
 constraint sumItems <= totalProducts;
 
 constraint forall(i in 1..n)( SelectedProduces[i] <= ProduceQuantity[i]);
+%constraint forall(i in 1..n)((SelectedProduces[i] * DistanceBetween[i])<=(SelectedProduces[i]*Prices[i]));
 
 var float: choosenlocation;
-choosenlocation = sum(j in 1..n)(SelectedProduces[j]*DisAtanceBetween[j]);
+var float :byprice=sum(j in 1..n)(SelectedProduces[j]*Prices[j]);
+var float :byDistance=sum(j in 1..n)(SelectedProduces[j]*DistanceBetween[j]);
+constraint
+choosenlocation =if byprice>=byDistance then byprice else byDistance endif;
+
 
 solve minimize choosenlocation;
 

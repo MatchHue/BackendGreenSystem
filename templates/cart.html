@@ -19,20 +19,16 @@
           <th scope="col">Name</th>
           <th scope="col">Quantity</th>
           <th scope="col">Price</th>
-          <th scope="col"></th>
+          <th scope="col">Action</th>
         </tr>
       </thead>
       <tbody class="cart-body">
             {%for item in items%}
           <tr>
-              <td>{{ item.name }}</td>
-              <td>{{ item.cart_quantity}}</td>
-              <td>{{ item.price }}</td>
-              <td>
-                <div class="col-sm" id="cart-checkout">
-                  <a href="/remove_item/{{user.id}}" class="btn btn-danger btn-sm active" style="font-family:Arial, Helvetica, sans-serif">Remove</a>
-              </div>
-              </td>
+              <td>{{ items[i].name }}</td>
+              <td>{{ carts[i].cart_quantity}}</td>
+              <td>{{ items[i].price }}</td>
+              <td><a href="/delete_cart_item/{{carts[i].cart_id}}" class="btn btn_secondary bt-sm active">Remove Item</a></td>
           </tr>
           {%endfor%}
       </tbody>

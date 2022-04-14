@@ -52,7 +52,8 @@
                 <p>Bought from {{buyer_items[i].user.username}}</p>
                 <p>{{buyer_items[i].name}}</p>
                 <a href="/buyer_order/{{buyers_orders[i].order_id}}" class="btn btn-primary btn-sm active">Order details</a><br />
-            </div>
+                <br/>
+                <a href="/delete_order/{{buyers_orders[i].order_id }}" class="btn btn-primary btn-sm active">Remove Order</a>
         </div>
     </div>
 </div>
@@ -81,6 +82,9 @@
                 <p>Bought by {{buyer[i].username}}</p>
                 <p>{{seller_items[i].name}}</p>
                 <a href="/seller_order/{{sellers_orders[i].order_id}}" class="btn btn-primary btn-sm active">Order details</a><br />
+
+                <br/>
+                <a href="/delete_order/{{sellers_orders[i].order_id }}" class="btn btn-primary btn-sm active">Remove Order</a>
             </div>
         </div>
     </div>
