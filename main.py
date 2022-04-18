@@ -238,7 +238,6 @@ def logout():
 
 @app.route('/get_all_users',methods=['GET'])
 def get_all_users():
-
     users=User.query.all()
     return users
 
