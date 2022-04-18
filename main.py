@@ -542,7 +542,20 @@ def bulk_purchase():
                 new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
                 db.session.add(new_bulk)
             db.session.commit()
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
+
+            sellerschoosen=[]
+            for item in listofitems:
+                sellerschoosen.append(item.user_id)
+            uniqueSellers=[]
+            for s in sellerschoosen:
+                if s not in uniqueSellers:
+                    uniqueSellers.append(s)
+            totaldistance=0
+            for u in uniqueSellers:
+                user=User.query.get(u)
+                d=convert_to_km(user.latitude,user.longtitude,current_user.latitude,current_user.longtitude)
+                totaldistance=totaldistance+d
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost,totaldistance=int(math.ceil(totaldistance)))
 
 
         if sort=="Location":
@@ -585,7 +598,21 @@ def bulk_purchase():
                 new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
                 db.session.add(new_bulk)
             db.session.commit()
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
+
+            sellerschoosen=[]
+            for item in listofitems:
+                sellerschoosen.append(item.user_id)
+            uniqueSellers=[]
+            for s in sellerschoosen:
+                if s not in uniqueSellers:
+                    uniqueSellers.append(s)
+            totaldistance=0
+            for u in uniqueSellers:
+                user=User.query.get(u)
+                d=convert_to_km(user.latitude,user.longtitude,current_user.latitude,current_user.longtitude)
+                totaldistance=totaldistance+d
+                
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost,totaldistance=int(math.ceil(totaldistance)))
     
 
         if sort=="Location or Price":
@@ -628,8 +655,20 @@ def bulk_purchase():
                 new_bulk=Bulk(user_id=current_user.id,item_id=listofitems[i].id,quantity_bought=listofselected[i])
                 db.session.add(new_bulk)
             db.session.commit()
-            
-            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost)
+            sellerschoosen=[]
+            for item in listofitems:
+                sellerschoosen.append(item.user_id)
+            uniqueSellers=[]
+            for s in sellerschoosen:
+                if s not in uniqueSellers:
+                    uniqueSellers.append(s)
+            totaldistance=0
+            for u in uniqueSellers:
+                user=User.query.get(u)
+                d=convert_to_km(user.latitude,user.longtitude,current_user.latitude,current_user.longtitude)
+                totaldistance=totaldistance+d
+
+            return render_template('bulk_query.html',items=listofitems,select=listofselected,iterations=iterations,totalcost=totalcost,totaldistance=int(math.ceil(totaldistance)))
 
     return render_template('bulk_purchase.html', form=form, items=unique)
 
