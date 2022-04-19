@@ -468,6 +468,7 @@ def bulk_by_location_or_price(sellers,quantity,quantites,prices):
 def bulk_purchase():
     items=Item.query.all()
     unique=[]
+    deletebulk()
     for item in items:
         if item.name not in unique:
             unique.append(item.name)

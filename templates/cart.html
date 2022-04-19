@@ -22,8 +22,8 @@
             {%for i in range(length)%}
           <tr>
               <td>{{ items[i].name }}</td>
-              <td>{{ carts[i].cart_quantity}}</td>
-              <td>{{ items[i].price }}</td>
+              <td>{{ carts[i].cart_quantity}} kg</td>
+              <td>${{ items[i].price }}</td>
               <td><a href="/delete_cart_item/{{carts[i].cart_id}}" class="btn btn_secondary bt-sm active">Remove Item</a></td>
           </tr>
           {%endfor%}
