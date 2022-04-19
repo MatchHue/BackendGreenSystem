@@ -50,7 +50,6 @@
                 <p class="card-text">From {{items[i].user.username}}</p>
                 <p class="card-text">${{items[i].price}} per kg</p> <p class="card-text">{{select[i]}}kg To Buy</p>
                 <p class="card-text">Cost : $ {{items[i].price * select[i]}}</p>
-                <a href="/add_bulk_to_cart/{{items[i].id}}/{{select[i]}}" class="btn btn-primary btn-sm active">Add Item to Cart</a>
                 <br/>
                 <br/>
                 <a href="/user_location/{{items[i].user.id}}" class="btn btn-primary btn-sm active">View Location</a>
