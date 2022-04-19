@@ -18,6 +18,7 @@
         <p style="text-align: center;">Order Quantity : {{order.quantity_bought}} kg</p>
         <p style="text-align: center;">Order Price : ${{item.price * order.quantity_bought}}</p>
         <p style="text-align: center;">Buyer: {{buyer.username}}</p>
+        <p style="text-align: center;">Contact: {{buyer.phone_number}}</p>
         <form class="form-inline" action="/confirm_order/{{order.order_id}}" method="POST">
             <div class="form-group mx-sm-3 mb-2">
               <input type="text" style="width: 100%;" class="form-control" name="ordercode" placeholder="Enter Order Code">
