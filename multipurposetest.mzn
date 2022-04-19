@@ -12,8 +12,7 @@ array[1..n] of float: Prices;
 
 int:quantity;
 
-float: maxdistance;
-float: maxprice;
+
 var int:sumItems;
 var int:totalProducts;
 
